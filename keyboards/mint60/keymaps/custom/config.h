@@ -16,8 +16,36 @@
 
 #pragma once
 
+/* 
+ * Tap Dance Configurarions
+ */
+#undef  TAPPING_TERM
+#define TAPPING_TERM 100
+#define RETRO_TAPPING
+#define PERMISSVE_HOLD
+/* Tap Dance Setting */
+
 /* Use I2C or Serial, not both */
 #define USE_SERIAL
 // #define USE_I2C
 
 // #define MASTER_RIGHT
+
+/*
+ * Mouse Keys Configuration
+ */
+#undef  MOUSEKEY_DELAY
+#define MOUSEKEY_DELAY 0
+#undef  MOUSEKEY_TIME_TO_MAX
+// #define MOUSEKEY_TIME_TO_MAX 0
+#define MOUSEKEY_TIME_TO_MAX 100
+#undef  MOUSEKEY_INTERVAL
+#define MOUSEKEY_INTERVAL 0
+#undef  MOUSEKEY_MAX_SPEED
+#define MOUSEKEY_MAX_SPEED 1
+#undef  MOUSEKEY_WHEEL_INTERVAL
+#define MOUSEKEY_WHEEL_INTERVAL 50
+#undef  MOUSEKEY_WHEEL_TIME_TO_MAX
+#define MOUSEKEY_WHEEL_TIME_TO_MAX 0
+#undef  MOUSEKEY_WHEEL_MAX_SPEED
+#define MOUSEKEY_WHEEL_MAX_SPEED 5
