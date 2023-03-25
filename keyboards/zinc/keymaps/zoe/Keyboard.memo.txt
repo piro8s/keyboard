@@ -1,23 +1,23 @@
 Keyboard
-            : US        --> JIS
-    KC_AT   : @         --> "           ( [Shift] + KC_2 )
-    KC_CIRC : ^         --> &           ( [Shift] + KC_6 )
-    KC_AMPR : &         --> '           ( [Shift] + KC_7 )
-    KC_ASTR : *         --> (           ( [Shift] + KC_8 )
-    KC_LPRN : (         --> )           ( [Shift] + KC_9 )
-    KC_RPRN : )         --> Non         ( [Shift] + KC_0 )
-    KC_MINS : -   / _   --> -   / =
-    KC_EQL  : =   / +   --> ^   / ~
-    KC_JYEN : Non       --> ¥  / |
-    KC_LBRC : [   / {   --> @   / `
-    KC_RBRC : ]   / }   --> [   / {
-    KC_SCLN : ;   / :   --> ;   / +
-    KC_QUOT : '   / "   --> :   / *
-    KC_BSLS : \   / |   --> ]   / }
-    KC_RO   : Non       --> ¥  / _
+            : US        <--> JIS
+    KC_AT   : @         <--> "           ( [Shift] + KC_2 )
+    KC_CIRC : ^         <--> &           ( [Shift] + KC_6 )
+    KC_AMPR : &         <--> '           ( [Shift] + KC_7 )
+    KC_ASTR : *         <--> (           ( [Shift] + KC_8 )
+    KC_LPRN : (         <--> )           ( [Shift] + KC_9 )
+    KC_RPRN : )         <--> Non         ( [Shift] + KC_0 )
+    KC_MINS : -   / _   <--> -   / =
+    KC_EQL  : =   / +   <--> ^   / ~
+    KC_JYEN : Non       <--> ¥  / |
+    KC_LBRC : [   / {   <--> @   / `
+    KC_RBRC : ]   / }   <--> [   / {
+    KC_SCLN : ;   / :   <--> ;   / +
+    KC_QUOT : '   / "   <--> :   / *
+    KC_BSLS : \   / |   <--> ]   / }
+    KC_RO   : Non       <--> ¥  / _
 
 
-    Windows : key       <-> Mac     : key
-    Win     : KC_LGUI   <-> ---
-    Ctrl    : KC_LCTL   <-> Command : KC_LGUI
+    Windows : key       <--> Mac     : key
+    Win     : KC_LGUI   <--> ---
+    Ctrl    : KC_LCTL   <--> Command : KC_LGUI
 

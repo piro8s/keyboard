@@ -35,7 +35,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    //#define RGBLIGHT_EFFECT_ALTERNATING
 #endif
 
-#undef TAPPING_TERM
-#define TAPPING_TERM 300
-// #define PERMISSIVE_HOLD
-// #define TD_ESCP TD(TD_ESC_CAPS)
+// ### Zinc already defined...
+// // Set LED control pin on ProMicro
+// #if defined(RGBLIGHT_ENABLE)
+//    // #define RGB_DI_PIN B6
+//    // -->Zinc already defined...
+// #endif
+
+// Tad Dance Setting
+#if defined(TAP_DANCE_ENABLE)
+   #undef TAPPING_TERM
+   #define TAPPING_TERM 300
+   // #define PERMISSIVE_HOLD
+   // #define TD_ESCP TD(TD_ESC_CAPS)
+#endif

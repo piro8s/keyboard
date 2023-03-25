@@ -24,6 +24,7 @@ enum layer_number {
 };
 
 enum custom_keycodes {
+  // Keymap Layer
   JIS = SAFE_RANGE,
   LOWER,
   RAISE,
@@ -31,6 +32,9 @@ enum custom_keycodes {
   KANA,
   EISU,
   RGBRST,
+  // Set Key Layout for Windows/Mac
+  SET_WIN,
+  SET_MAC,
   // Same Key on Windows & Mac
   WM_ZHTG,  // 全角半角
   WM_LGUI,  // Win/Cmd
@@ -49,9 +53,11 @@ enum custom_keycodes {
   JS_AMPR,  // &
   JS_ASTR,  // *
   JS_PLUS,  // +
-  // JIS as US Keys
+  // like US key on JIS leyout
   JU_SCLN,  // ; and :
   JU_QUOT,  // ' and "
+  // LED
+  LED_TOG,
 };
 
 /* Tap Dance */
@@ -81,7 +87,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
    * | Shift |   Z   |   X   |   C   |   V   |   B   |             |   N   |   M   |   ,<  |   .>  |   /?  |   '"  |
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
-   * |       |       |Win/Cmd|  Alt  | LOWER | Space |             | Space | RAISE |  App  |   _   |   @`  | ZHTog |
+   * |       |       |Win/Cmd|  Alt  | LOWER | Space |             | Space | RAISE |  App  |   _   |   @`  | 全/半 |
    * `-----------------------------------------------'             `-----------------------------------------------'
    */
   [_JIS] = LAYOUT_ortho_4x12(
@@ -98,7 +104,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
    * | Shift |   _   |   &   |   [   |   ]   |   %   |             |   0   |   1!  |   2"  |   3#  |   /?  |   ^~  |
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
-   * |       |       |Win/Cmd|  Alt  | LOWER |       |             |   =   | RAISE |  App  |   ,<  |   .>  | ZHTog |
+   * |       |       |Win/Cmd|  Alt  | LOWER |       |             |   =   | RAISE |  App  |   ,<  |   .>  | 全/半 |
    * `-----------------------------------------------'             `-----------------------------------------------'
    */
   [_LOWER] = LAYOUT_ortho_4x12( \
@@ -116,7 +122,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
    * | Shift |  F9   |  F10  |  F11  |  F12  |       |             |  WlLf |  WlUp | LtClc | RtClc |  WlDw |  WlRt |
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
-   * |       |       |Win/Cmd|  Alt  | LOWER | Space |             |       | RAISE |  App  |       |       | ZHTog |
+   * |       |       |Win/Cmd|  Alt  | LOWER | Space |             |       | RAISE |  App  |       |       | 全/半 |
    * `-----------------------------------------------'             `-----------------------------------------------'
    */
   [_RAISE] = LAYOUT_ortho_4x12( \
@@ -129,19 +135,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
 
   /* Adjust ( Lower + Raise )
    * ,-----------------------------------------------.             ,-----------------------------------------------.
-   * |  Mac  |       |       |       |       |       |             |       |       |       |       |       |  Win  |
+   * |       |       |Win Map|       |       |       |             |       |       |       |       |       |  LED  |
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
    * |       |       |       |       |       |       |             |       |       |       |       |       |       |
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
-   * |       |       |       |       |       |       |             |       |       |       |       |       |       |
+   * |       |       |       |       |       |       |             |       |Mac Map|       |       |       |       |
    * |-------+-------+-------+-------+-------+-------|             |-------+-------+-------+-------+-------+-------|
    * |       |       |       |       | LOWER |       |             |       | RAISE |       |       |       | Reset |
    * `-----------------------------------------------'             `-----------------------------------------------'
    */
   [_ADJUST] =  LAYOUT_ortho_4x12( \
-    AG_NORM, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, AG_SWAP, \
+    XXXXXXX, XXXXXXX, AG_SWAP, XXXXXXX, XXXXXXX, XXXXXXX,           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RGB_TOG, \
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,           XXXXXXX, AG_NORM, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, LOWER  , XXXXXXX,           XXXXXXX, RAISE  , XXXXXXX, XXXXXXX, XXXXXXX, RESET    \
   ),
 
@@ -220,6 +226,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   #endif
    //*/
   switch (keycode) {
+    /*****************************
+     *****************************
+     * Keymap Layer              *
+     *****************************
+     *****************************/
     case JIS:
       if (record->event.pressed) {
         set_single_persistent_default_layer(_JIS);
@@ -319,7 +330,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     /*****************************
      *****************************
-     * Windows / Mac 共用キー    *
+     * Set Key Layout for Windows/Mac *
+     *****************************
+     *****************************/
+    case SET_WIN: // Set Windows Layout
+      if (record->event.pressed) {
+        tap_code16(AG_SWAP);    // Change Key Layout for Windows
+      }
+      return false;
+      break;
+
+    case SET_MAC: // Set Mac Keymap
+      if (record->event.pressed) {
+        tap_code16(AG_NORM);    // Change Key Layout for Mac
+      }
+      return false;
+      break;
+
+    /*****************************
+     *****************************
+     * Same Key on Windows & Mac *
      *****************************
      *****************************/
     case WM_ZHTG: // 全角/英数切替(Windows/Mac共用: ただし、キーマップの切替が必要)
@@ -334,12 +364,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         else {                                                      // for Mac
           TOG_STATUS_ZENHAN = !TOG_STATUS_ZENHAN;
           if (TOG_STATUS_ZENHAN) {
-            register_code(KC_LANG1);    // KANA
-            unregister_code(KC_LANG1);
+            tap_code(KC_LANG1);    // KANA
           }
           else {
-            register_code(KC_LANG2);    // EISU
-            unregister_code(KC_LANG2);
+            tap_code(KC_LANG2);    // EISU
           }
         }
         if (is_mod_shift) register_code(MOD_BIT(KC_LSFT));
@@ -394,15 +422,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     /*****************************
      *****************************
-     * Only One Key              *
+     * JIS One-Symbol Keys       *
      *****************************
      *****************************/
     case JS_AT: // Always JIS @
       if (record->event.pressed) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift) unregister_code(KC_LSFT);
-        register_code(KC_LBRC);
-        unregister_code(KC_LBRC);
+        tap_code(KC_LBRC);
         if (is_mod_shift)  register_code(KC_LSFT);
       }
       return false;
@@ -413,8 +440,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_LBRC);
-        unregister_code(KC_LBRC);
+        tap_code(KC_LBRC);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -426,8 +452,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_8);
-        unregister_code(KC_8);
+        tap_code(KC_8);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -439,8 +464,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_9);
-        unregister_code(KC_9);
+        tap_code(KC_9);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -452,8 +476,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_RBRC);
-        unregister_code(KC_RBRC);
+        tap_code(KC_RBRC);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -465,8 +488,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_BSLS);
-        unregister_code(KC_BSLS);
+        tap_code(KC_BSLS);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -477,8 +499,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift) unregister_code(KC_LSFT);
-        register_code(KC_RBRC);
-        unregister_code(KC_RBRC);
+        tap_code(KC_RBRC);
         if (is_mod_shift)  register_code(KC_LSFT);
       }
       return false;
@@ -488,8 +509,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift) unregister_code(KC_LSFT);
-        register_code(KC_BSLS);
-        unregister_code(KC_BSLS);
+        tap_code(KC_BSLS);
         if (is_mod_shift)  register_code(KC_LSFT);
       }
       return false;
@@ -499,8 +519,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift) unregister_code(KC_LSFT);
-        register_code(KC_MINS);
-        unregister_code(KC_MINS);
+        tap_code(KC_MINS);
         if (is_mod_shift)  register_code(KC_LSFT);
       }
       return false;
@@ -511,8 +530,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_RO);
-        unregister_code(KC_RO);
+        tap_code(KC_RO);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -524,8 +542,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_6);
-        unregister_code(KC_6);
+        tap_code(KC_6);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -537,8 +554,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_QUOT);
-        unregister_code(KC_QUOT);
+        tap_code(KC_QUOT);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -550,8 +566,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
         if (is_mod_shift)  ;
         else register_code(KC_LSFT);
-        register_code(KC_SCLN);
-        unregister_code(KC_SCLN);
+        tap_code(KC_SCLN);
         if (is_mod_shift)  ;
         else  unregister_code(KC_LSFT);
       }
@@ -567,12 +582,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {
           unregister_code(KC_LSFT);
-          register_code(JP_COLN);     // :
-          unregister_code(JP_COLN);
-          register_code(MOD_BIT(KC_LSFT));
+          tap_code(JP_COLN);     // :
+          register_code(KC_LSFT);
         } else {
-          register_code(JP_SCLN);     // ;
-          unregister_code(JP_SCLN);
+          tap_code(JP_SCLN);     // ;
         }
       }
       return false;
@@ -581,17 +594,27 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case JU_QUOT: // JIS Key as ' and "
       if (record->event.pressed) {
         if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {
-          register_code(JP_2);      // "
-          unregister_code(JP_2);
+          tap_code(JP_2);      // "
         } else {
-          register_code(KC_LSFT);
-          register_code(JP_7);      // '
-          unregister_code(JP_7);
-          unregister_code(KC_LSFT);
+          tap_code16(S(JP_7));  // '
         }
       }
       return false;
       break;
+
+    /*****************************
+     *****************************
+     * LED                       *
+     *****************************
+     *****************************/
+    // なんか上手くいかなかった
+    // case LED_TOG: // LED ON/OFF Toggle
+    //   if (record->event.pressed) {
+    //       tap_code16(RGB_TOG);
+    //   }
+    //   return false;
+    //   break;
+
   }
   return true;
 }
