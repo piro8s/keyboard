@@ -1,6 +1,7 @@
 #include QMK_KEYBOARD_H
 
-#include "keymap_jp.h"    // Japanese key-mapping
+#include "keymap_japanese.h"  // Japanese key-mapping
+#include "keycode_revival.h"  // 失われたキーコードに復活の呪文
 
 #ifdef RGBLIGHT_ENABLE
 //Following line allows macro to read current RGB settings
@@ -65,9 +66,9 @@ enum custom_keycodes {
 enum {
     TD_SFT_CPS,   // 1:Shift(Left), 2:Caps Lock (Windows/Mac共用)
 };
-void wmscp_finished(qk_tap_dance_state_t *state, void *user_data);  // Tap Dance finished for TD_SFT_CPS
-void wmscp_reset(qk_tap_dance_state_t *state, void *user_data);     // Tap Dance reset for TD_SFT_CPS
-qk_tap_dance_action_t tap_dance_actions[] = {
+void wmscp_finished(tap_dance_state_t *state, void *user_data);  // Tap Dance finished for TD_SFT_CPS
+void wmscp_reset(tap_dance_state_t *state, void *user_data);     // Tap Dance reset for TD_SFT_CPS
+tap_dance_action_t tap_dance_actions[] = {
     [TD_SFT_CPS]  = ACTION_TAP_DANCE_FN_ADVANCED(NULL, wmscp_finished, wmscp_reset),
 };
 
@@ -635,7 +636,7 @@ typedef enum {
 } td_state_t;
 static td_state_t td_state;   // Tap Dance の状態を保持する
 // 現在の Tap Dance の状態を取得
-uint8_t cur_dance(qk_tap_dance_state_t *state) {
+uint8_t cur_dance(tap_dance_state_t *state) {
     if (state->count == 1) {
         if (state->interrupted || !state->pressed) return SINGLE_TAP;
         else return SINGLE_HOLD;
@@ -644,7 +645,7 @@ uint8_t cur_dance(qk_tap_dance_state_t *state) {
     else return 99; // 上記で返却する最大の状態の値より大きい任意の数
 }
 // Tap Dance の状態が決まった瞬間に呼ばれる
-void wmscp_finished(qk_tap_dance_state_t *state, void *user_data) {
+void wmscp_finished(tap_dance_state_t *state, void *user_data) {
     td_state = cur_dance(state);
     switch (td_state) {
         case SINGLE_TAP:
@@ -660,7 +661,7 @@ void wmscp_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 // Tap Dance の状態が終了した瞬間に呼ばれる
-void wmscp_reset(qk_tap_dance_state_t *state, void *user_data) {
+void wmscp_reset(tap_dance_state_t *state, void *user_data) {
     switch (td_state) {
         case SINGLE_TAP:
           unregister_code16(KC_LSFT);
