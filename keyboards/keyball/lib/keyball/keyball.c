@@ -66,6 +66,7 @@ static inline int8_t clip2int8(int16_t v) {
     return (v) < -127 ? -127 : (v) > 127 ? 127 : (int8_t)v;
 }
 
+#ifdef OLED_ENABLE
 static const char *format_4d(int8_t d) {
     static char buf[5] = {0}; // max width (4) + NUL (1)
     char        lead   = ' ';
@@ -97,6 +98,7 @@ static char to_1x(uint8_t x) {
     x &= 0x0f;
     return x < 10 ? x + '0' : x + 'a' - 10;
 }
+#endif
 
 static void add_cpi(int8_t delta) {
     int16_t v = keyball_get_cpi() + delta;
@@ -500,8 +502,8 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
         // process KC_MS_BTN1~8 by myself
         // See process_action() in quantum/action.c for details.
         case KC_MS_BTN1 ... KC_MS_BTN8: {
-            extern void register_button(bool, enum mouse_buttons);
-            register_button(record->event.pressed, MOUSE_BTN_MASK(keycode - KC_MS_BTN1));
+            extern void register_mouse(enum mouse_buttons, bool);
+            register_mouse(MOUSE_BTN_MASK(keycode - KC_MS_BTN1), record->event.pressed);
             // to apply QK_MODS actions, allow to process others.
             return true;
         }

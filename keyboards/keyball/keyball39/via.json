@@ -2,6 +2,12 @@
   "name": "Keyball39",
   "vendorId": "0x5957",
   "productId": "0x0200",
+  "manufacturer": "Yowkees",
+  "usb": {
+    "vid": "0x5957",
+    "pid": "0x0200",
+    "device_version": "0.0.1"
+  },
   "matrix": { "rows": 8, "cols": 6 },
   "lighting": "qmk_rgblight",
   "layouts" : {
