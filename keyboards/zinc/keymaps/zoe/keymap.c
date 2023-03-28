@@ -38,8 +38,8 @@ enum custom_keycodes {
   SET_MAC,
   // Same Key on Windows & Mac
   WM_ZHTG,  // 全角半角
-  WM_LGUI,  // Win/Cmd
-  WM_LALT,  // Alt
+  WM_LGUI,  // Windows/Control
+  WM_LCTL,  // Control/Command
   // JIS One-Symbol Keys
   JS_AT,    // @
   JS_GRV,   // `
@@ -93,9 +93,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
    */
   [_JIS] = LAYOUT_ortho_4x12(
     KC_TAB , KC_Q   , KC_W   , KC_E   , KC_R   , KC_T   ,           KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   , KC_BSPC, \
-    KC_LCTL, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   ,           KC_H   , KC_J   , KC_K   , KC_L   , JU_SCLN, KC_ENT , \
+    WM_LCTL, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   ,           KC_H   , KC_J   , KC_K   , KC_L   , JU_SCLN, KC_ENT , \
     TD(SCP), KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   ,           KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, JU_QUOT, \
-    XXXXXXX, XXXXXXX, WM_LGUI, WM_LALT, LOWER  , KC_SPC ,           KC_SPC , RAISE  , KC_APP , JS_UNDS, JP_AT  , WM_ZHTG  \
+    XXXXXXX, XXXXXXX, WM_LGUI, KC_LALT, LOWER  , KC_SPC ,           KC_SPC , RAISE  , KC_APP , JS_UNDS, JP_AT  , WM_ZHTG  \
   ),
   /* Lower
    * ,-----------------------------------------------.             ,-----------------------------------------------.
@@ -110,9 +110,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
    */
   [_LOWER] = LAYOUT_ortho_4x12( \
     KC_ESC , KC_EXLM, KC_QUES, JS_LPRN, JS_RPRN, KC_DLR ,           JP_YEN , KC_7   , KC_8   , KC_9   , JS_ASTR, KC_DEL , \
-    KC_LCTL, KC_HASH, JS_GRV , JS_LCBR, JS_RCBR, JS_AT  ,           JS_MINS, KC_4   , KC_5   , KC_6   , JS_PLUS, KC_ENT , \
+    WM_LCTL, KC_HASH, JS_GRV , JS_LCBR, JS_RCBR, JS_AT  ,           JS_MINS, KC_4   , KC_5   , KC_6   , JS_PLUS, KC_ENT , \
     KC_LSFT, JS_UNDS, JS_AMPR, JS_LBRC, JS_RBRC, KC_PERC,           KC_0   , KC_1   , KC_2   , KC_3   , KC_SLSH, JP_CIRC, \
-    XXXXXXX, XXXXXXX, WM_LGUI, WM_LALT, LOWER  , XXXXXXX,           KC_PEQL, RAISE  , KC_APP , KC_COMM, KC_DOT , WM_ZHTG  \
+    XXXXXXX, XXXXXXX, WM_LGUI, KC_LALT, LOWER  , XXXXXXX,           KC_PEQL, RAISE  , KC_APP , KC_COMM, KC_DOT , WM_ZHTG  \
   ),
 
   /* Raise
@@ -128,9 +128,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { \
    */
   [_RAISE] = LAYOUT_ortho_4x12( \
     KC_ESC , KC_F1  , KC_F2  , KC_F3  , KC_F4  , XXXXXXX,           XXXXXXX, KC_PGUP, KC_UP  , KC_PGDN, XXXXXXX, KC_DEL , \
-    KC_LCTL, KC_F5  , KC_F6  , KC_F7  , KC_F8  , XXXXXXX,           KC_HOME, KC_LEFT, KC_DOWN, KC_RGHT, KC_END , KC_ENT , \
+    WM_LCTL, KC_F5  , KC_F6  , KC_F7  , KC_F8  , XXXXXXX,           KC_HOME, KC_LEFT, KC_DOWN, KC_RGHT, KC_END , KC_ENT , \
     KC_LSFT, KC_F9  , KC_F10 , KC_F11 , KC_F12 , XXXXXXX,           KC_WH_L, KC_WH_U, KC_BTN1, KC_BTN2, KC_WH_D, KC_WH_R, \
-    XXXXXXX, XXXXXXX, WM_LGUI, WM_LALT, LOWER  , KC_SPC ,           XXXXXXX, RAISE  , KC_APP , XXXXXXX, XXXXXXX, WM_ZHTG  \
+    XXXXXXX, XXXXXXX, WM_LGUI, KC_LALT, LOWER  , KC_SPC ,           XXXXXXX, RAISE  , KC_APP , XXXXXXX, XXXXXXX, WM_ZHTG  \
   ),
   // ),
 
@@ -355,68 +355,44 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
      *****************************/
     case WM_ZHTG: // 全角/英数切替(Windows/Mac共用: ただし、キーマップの切替が必要)
       if (record->event.pressed) {
-        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));
-        bool is_mod_control = (keyboard_report->mods & MOD_BIT(KC_LCTL));
         // Shift, Ctrlが押されていても、全角/半角の切り替えを行えるようにする
-        if (is_mod_shift) unregister_code(KC_LSFT);
+        bool is_mod_shift   = (keyboard_report->mods & MOD_BIT(KC_LSFT));
+        bool is_mod_control = (keyboard_report->mods & MOD_BIT(KC_LCTL));
+        if (is_mod_shift  ) unregister_mods(KC_LSFT);
         if (is_mod_control) unregister_code(KC_LCTL);
         // Windows/Macのキーマップが切り替わっているか判断し、全角/英数切替する
         if(keymap_config.swap_lalt_lgui) SEND_STRING(SS_LALT("`")); // for Windows
         else {                                                      // for Mac
           TOG_STATUS_ZENHAN = !TOG_STATUS_ZENHAN;
-          if (TOG_STATUS_ZENHAN) {
-            tap_code(KC_LANG1);    // KANA
-          }
-          else {
-            tap_code(KC_LANG2);    // EISU
-          }
+          if (TOG_STATUS_ZENHAN) tap_code(KC_LNG1);  // KANA: 全角
+          else                   tap_code(KC_LNG2);  // EISU：半角
         }
-        if (is_mod_shift) register_code(MOD_BIT(KC_LSFT));
-        if (is_mod_control) register_code(MOD_BIT(KC_LCTL));
+        if (is_mod_shift  ) register_mods(KC_LSFT);
+        if (is_mod_control) register_code(KC_LCTL);
       }
       return false;
       break;
 
     case WM_LGUI: // GUI: Win/Cmd(Windows/Mac共用)
       if (record->event.pressed) {
-        register_code(KC_LGUI);
-        // if(keymap_config.swap_lalt_lgui) register_code(KC_LALT);  // for Windows
-        // else register_code(KC_LGUI);                              // for Mac
-        #ifdef CONSOLE_ENABLE /* Debug Log */
-        if(keymap_config.swap_lalt_lgui) uprintf("  : register_code(KC_LALT)\n");  // for Windows
-        else uprintf("  : register_code(KC_LGUI)\n");                              // for Mac
-        #endif
+        if(keymap_config.swap_lalt_lgui) register_code(KC_LALT);    // for Windows
+        else                             register_code(KC_LCTL);    // for Mac
       }
       else {
-        unregister_code(KC_LGUI);
-        // if(keymap_config.swap_lalt_lgui) unregister_code(KC_LALT);
-        // else unregister_code(KC_LGUI);
-        #ifdef CONSOLE_ENABLE /* Debug Log */
-        if(keymap_config.swap_lalt_lgui) uprintf("  : unregister_code(KC_LALT)\n");  // for Windows
-        else uprintf("  : unregister_code(KC_LGUI)\n");                              // for Mac
-        #endif
+        if(keymap_config.swap_lalt_lgui) unregister_code(KC_LALT);  // for Windows
+        else                             unregister_code(KC_LCTL);  // for Mac
       }
       return false;
       break;
 
-    case WM_LALT: // Alt(Windows/Mac共用)
+    case WM_LCTL: // Alt(Windows/Mac共用)
       if (record->event.pressed) {
-        register_code(KC_LALT);
-        // if(keymap_config.swap_lalt_lgui) register_code(KC_LGUI);  // for Windows
-        // else register_code(KC_LALT);                              // for Mac
-        #ifdef CONSOLE_ENABLE /* Debug Log */
-        if(keymap_config.swap_lalt_lgui) uprintf("  : register_code(KC_LGUI)\n");  // for Windows
-        else uprintf("  : register_code(KC_LALT)\n");                              // for Mac
-        #endif
+        if(keymap_config.swap_lalt_lgui) register_code(KC_LCTL);    // for Windows
+        else                             register_code(KC_LGUI);    // for Mac
       }
       else {
-        unregister_code(KC_LALT);
-        // if(keymap_config.swap_lalt_lgui) unregister_code(KC_LGUI);
-        // else unregister_code(KC_LALT);
-        #ifdef CONSOLE_ENABLE /* Debug Log */
-        if(keymap_config.swap_lalt_lgui) uprintf("  : unregister_code(KC_LGUI)\n");  // for Windows
-        else uprintf("  : unregister_code(KC_LALT)\n");                              // for Mac
-        #endif
+        if(keymap_config.swap_lalt_lgui) unregister_code(KC_LCTL);  // for Windows
+        else                             unregister_code(KC_LGUI);  // for Mac
       }
       return false;
       break;
