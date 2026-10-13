@@ -61,7 +61,7 @@ enum custom_keycodes {
   JU_SCLN,  // ; and :
   JU_QUOT,  // ' and "
   // Original key
-  MY_CLCME, // - and =
+  // MY_CLCME, // - and =
   MY_CLCPB, // + and *
   // Microsoft Teams short cut key
   TMS_MICMT,// Mic Mute on Microsoft Teams: Control + Shift + M
@@ -96,22 +96,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    *                     ,---------.                                                                                  ,---------.
    *           ,---------|CPI-1000 |---------.                                                              ,---------|         |---------.
    * ,---------|         |---------|CPI+1000 |---------.                                          ,---------|         |---------|         |---------.
-   * |ResetConf|---------| CPI-100 |---------|         |                                          |         |---------| ClickLt |---------|         |
+   * |ResetConf|---------| CPI-100 |---------|SaveConf |                                          |         |---------| ClickLt |---------|         |
    * |---------|         |---------| CPI+100 |---------|                                          |---------| Forward |---------| ClickRt |---------|
-   * |         |---------|         |---------|         |                                          |         |---------|ScrlMode |---------|         |
+   * |  Ctrl   |---------|         |---------|         |                                          |         |---------|ScrlMode |---------|         |
    * |---------|         |---------|         |---------|                                          |---------|  Back   |---------|         |---------|
-   * |SaveConf |---------|         |---------|         |                                          |         |---------'         `---------|         |
+   * |  Shift  |---------|    v    |---------|         |                                          |         |---------'         `---------|         |
    * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
-   * |         |---------'          |         |,---------.                                     ,---------.                                |         |
+   * |         |---------'          |    v    |,---------.                                     ,---------.                                |         |
    * `---------'                    `---------'|  MAIN   |,---------.               ,---------.|  MAIN   |                                `---------'
    *                                           `---------'|         |               |         |`---------'
    *                                                      `---------'               `---------'
    */
   [_MOUSE] = LAYOUT_right_ball(
-    KBC_RST  , XXXXXXX  , CPI_D1K  , CPI_I1K  , XXXXXXX  ,                                    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,\
-    XXXXXXX  , XXXXXXX  , CPI_D100 , CPI_I100 , XXXXXXX  ,                                    XXXXXXX  , WM_WFWD  , MS_BTN1  , MS_BTN2  , XXXXXXX  ,\
-    KBC_SAVE , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,                                    XXXXXXX  , WM_WBAK  , SCRL_MO  , XXXXXXX  , XXXXXXX  ,\
-    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , MAIN     , XXXXXXX  ,              XXXXXXX ,  MAIN     ,                                  XXXXXXX   \
+    KBC_RST  , XXXXXXX  , CPI_D1K  , CPI_I1K  , KBC_SAVE ,                                    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,\
+    WM_LCTL  , XXXXXXX  , CPI_D100 , CPI_I100 , XXXXXXX  ,                                    XXXXXXX  , WM_WFWD  , MS_BTN1  , MS_BTN2  , XXXXXXX  ,\
+    KC_LSFT  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,                                    XXXXXXX  , WM_WBAK  , SCRL_MO  , XXXXXXX  , XXXXXXX  ,\
+    XXXXXXX  , XXXXXXX  , _______  , _______  , MAIN     , XXXXXXX  ,              XXXXXXX ,  MAIN     ,                                  XXXXXXX   \
   ),
 
   /* NUMBERS
@@ -131,7 +131,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    */
   [_NUMBERS] = LAYOUT_right_ball(
     KC_ESC   , KC_TAB   , JS_LPRN  , JS_RPRN  , KC_DLR   ,                                    JP_YEN   , KC_7     , KC_8     , KC_9     , KC_DEL   ,\
-    KC_LCTL  , JS_UNDS  , JS_LCBR  , JS_RCBR  , JP_AT    ,                                    MY_CLCME , KC_4     , KC_5     , KC_6     , MY_CLCPB ,\
+    WM_LCTL  , JS_UNDS  , JS_LCBR  , JS_RCBR  , JP_AT    ,                                    JP_MINS  , KC_4     , KC_5     , KC_6     , MY_CLCPB ,\
     KC_LSFT  , XXXXXXX  , JS_LBRC  , JS_RBRC  , KC_PERC  ,                                    KC_0     , KC_1     , KC_2     , KC_3     , JP_CIRC  ,\
     XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , _______  , XXXXXXX  ,              _______ ,  _______  ,                                  JP_AT     \
   ),
@@ -153,7 +153,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    */
   [_FUNCTIONS] = LAYOUT_right_ball(
     KC_ESC   , KC_TAB   , KC_F2    , KC_F3    , KC_F4    ,                                    KC_F1    , KC_PGUP  , KC_UP    , KC_PGDN  , KC_DEL   ,\
-    KC_LCTL  , KC_F5    , KC_F6    , KC_F7    , KC_F8    ,                                    KC_HOME  , KC_LEFT  , KC_DOWN  , KC_RGHT  , KC_END   ,\
+    WM_LCTL  , KC_F5    , KC_F6    , KC_F7    , KC_F8    ,                                    KC_HOME  , KC_LEFT  , KC_DOWN  , KC_RGHT  , KC_END   ,\
     KC_LSFT  , KC_F9    , KC_F10   , KC_F11   , KC_F12   ,                                    XXXXXXX  , XXXXXXX  , KC_APP   , XXXXXXX  , XXXXXXX  ,\
     XXXXXXX  , XXXXXXX  , _______  , _______  , _______  , _______  ,              _______ ,  _______  ,                                  XXXXXXX   \
   ),
@@ -172,8 +172,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * `---------'                    `---------'|    v    |,---------.               ,---------.|    v    |                                `---------'
    *                                           `---------'|         |               |         |`---------'
    *                                                      `---------'               `---------'
-   * TODO: SET_WIN を定義する：GUI=Windows、Ctrl=Command
-   * TODO: SET_MAC を定義する：GUI=Command、Ctrl=Control
    */
   [_ADJUST1] = LAYOUT_right_ball(
     UG_NEXT  , SET_WIN  , UG_HUED  , UG_HUEU  , XXXXXXX  ,                                    RGB_M_P  , RGB_M_B  , RGB_M_R  , RGB_M_SW , RGB_M_SN ,\
@@ -299,11 +297,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case WM_LGUI:
       if (record->event.pressed) {
         if(!TOG_STATUS_WINMAC) register_code(KC_LGUI);    // for Windows
-        else                  register_code(KC_LCTL);    // for Mac
+        else                   register_code(KC_LCTL);    // for Mac
       }
       else {
         if(!TOG_STATUS_WINMAC) unregister_code(KC_LGUI);  // for Windows
-        else                  unregister_code(KC_LCTL);  // for Mac
+        else                   unregister_code(KC_LCTL);  // for Mac
       }
       return false;
       break;
@@ -311,11 +309,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case WM_LCTL:
       if (record->event.pressed) {
         if(!TOG_STATUS_WINMAC) register_code(KC_LCTL);    // for Windows
-        else                  register_code(KC_LGUI);    // for Mac
+        else                   register_code(KC_LGUI);    // for Mac
       }
       else {
         if(!TOG_STATUS_WINMAC) unregister_code(KC_LCTL);  // for Windows
-        else                  unregister_code(KC_LGUI);  // for Mac
+        else                   unregister_code(KC_LGUI);  // for Mac
       }
       return false;
       break;
@@ -323,7 +321,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case WM_WBAK:
       if (record->event.pressed) {
         if(!TOG_STATUS_WINMAC) tap_code16(A(KC_LEFT));    // for Windows
-        else                  tap_code16(G(KC_RBRC));    // for Mac
+        else                   tap_code16(G(KC_RBRC));    // for Mac
       }
       return false;
       break;
@@ -346,7 +344,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (is_mod_shift) tap_code(KC_8);
         else              tap_code16(S(KC_8));
         // else              {register_code16(S(KC_8));unregister_code16(S(KC_8));}
-        // else              {register_mods(KC_LSFT);register_code(KC_8);unregister_code(KC_8);unregister_mods(KC_LSFT);}
+        // else              {register_mods(MOD_BIT(KC_LSFT));register_code(KC_8);unregister_code(KC_8);unregister_mods(MOD_BIT(KC_LSFT));}
       }
       return false;
       break;
@@ -381,9 +379,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case JS_LBRC:
       if (record->event.pressed) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
-        if (is_mod_shift) unregister_mods(KC_LSFT);
+        if (is_mod_shift) unregister_mods(MOD_BIT(KC_LSFT));
         tap_code(KC_RBRC);
-        if (is_mod_shift) register_mods(KC_LSFT);
+        if (is_mod_shift)   register_mods(MOD_BIT(KC_LSFT));
       }
       return false;
       break;
@@ -391,9 +389,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case JS_RBRC:
       if (record->event.pressed) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
-        if (is_mod_shift) unregister_mods(KC_LSFT);
+        if (is_mod_shift) unregister_mods(MOD_BIT(KC_LSFT));
         tap_code(KC_BSLS);
-        if (is_mod_shift) register_mods(KC_LSFT);
+        if (is_mod_shift)   register_mods(MOD_BIT(KC_LSFT));
       }
       return false;
       break;
@@ -401,10 +399,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case JS_UNDS:
       if (record->event.pressed) {
         bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
-        if (is_mod_shift) unregister_mods(KC_LSFT);
+        if (is_mod_shift) unregister_mods(MOD_BIT(KC_LSFT));
         if(!TOG_STATUS_WINMAC) tap_code16(S(KC_INT1));  // for Windows
-        else                  tap_code16(S(KC_MINS));  // for Mac
-        if (is_mod_shift) register_mods(KC_LSFT);
+        else                   tap_code16(S(KC_MINS));  // for Mac
+        if (is_mod_shift)   register_mods(MOD_BIT(KC_LSFT));
       }
       return false;
       break;
@@ -416,9 +414,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case JU_SCLN:
       if (record->event.pressed) {
         if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {  // shifted
-          unregister_mods(KC_LSFT);
+          unregister_mods(MOD_BIT(KC_LSFT));
           tap_code(JP_COLN);     // :
-          register_mods(KC_LSFT);
+        register_mods(MOD_BIT(KC_LSFT));
         } else {
           tap_code(JP_SCLN);     // ;
         }
@@ -440,17 +438,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     /*****************************
      * Original key              *
      *****************************/
-    // - and =
-    case MY_CLCME:
-      if (record->event.pressed) {
-        if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {  // shifted
-          tap_code(KC_PEQL);     // =
-        } else {
-          tap_code(KC_PMNS);     // -
-        }
-      }
-      return false;
-      break;
+    // // - and =
+    // case MY_CLCME:
+    //   if (record->event.pressed) {
+    //     if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {  // shifted
+    //       tap_code(KC_PEQL);     // =
+    //     } else {
+    //       tap_code(KC_PMNS);     // -
+    //     }
+    //   }
+    //   return false;
+    //   break;
     // + and *
     case MY_CLCPB:
       if (record->event.pressed) {
