@@ -34,3 +34,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #define TAP_CODE_DELAY 5
+
+// Automatic Mouse Layer (Keyball AML / QMK Auto Mouse)
+//   AML_TO で有効/無効、AML_I50/AML_D50 でタイムアウト調整、KBC_SAVE で EEPROM 保存
+#define POINTING_DEVICE_AUTO_MOUSE_ENABLE
+#define AUTO_MOUSE_DEFAULT_LAYER 1  // = _MOUSE (keymap.c の layer_number と一致させること)
+#define PERMISSIVE_HOLD
+#define KEYBALL_CPI_DEFAULT 1000
+#define KEYBALL_CPI_PRECISION 300
+#define AUTO_MOUSE_TIME 550
+

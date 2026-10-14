@@ -15,9 +15,13 @@ JISキーボード
 // #define LT_NM_MN LT_NUMBERS_MAIN
 #define CT(kc) LCTL_T(kc)
 #define ST(kc) LSFT_T(kc)
+#define AT(kc) LALT_T(kc)
 #define CTL_SCLN RCTL_T(KC_SCLN)
 // #define SET_WIN AG_SWAP
 // #define SET_MAC AG_NORM
+
+#define DEFAULT_CPI 10
+#define PRECISION_CPI 3
 
 enum layer_number {
     _MAIN = 0,
@@ -63,8 +67,10 @@ enum custom_keycodes {
   // Original key
   // MY_CLCME, // - and =
   MY_CLCPB, // + and *
+  // Mouse key
+  MS_PRCS_M, // Mouse Precision Mode(CPI:100)
   // Microsoft Teams short cut key
-  TMS_MICMT,// Mic Mute on Microsoft Teams: Control + Shift + M
+  TMS_MICMT, // Mic Mute on Microsoft Teams: Control + Shift + M
 
 };
 
@@ -74,44 +80,44 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    *                     ,---------.                                                                                  ,---------.
    *           ,---------|    E    |---------.                                                              ,---------|    I    |---------.
    * ,---------|    W    |---------|    R    |---------.                                          ,---------|    U    |---------|    O    |---------.
-   * |    Q    |---------|    D    |---------|    T    |                                          |    Y    |---------|    K    |---------|    P    |
+   * | Q /Ctrl |---------|    D    |---------|    T    |                                          |    Y    |---------|    K    |---------|    P    |
    * |---------|    S    |---------|    F    |---------|                                          |---------|    J    |---------|    L    |---------|
    * | A /Ctrl |---------|    C    |---------|    G    |                                          |    H    |---------|   , <   |---------| ;: /Ctrl|
-   * |---------|    X    |---------|    V    |---------|                                          |---------|    M    |---------|   . >   |---------|
-   * | Z /Shft |---------|   Win   |---------|    B    |                                          |    N    |---------'         `---------| /? /Shft|
+   * |---------|    X    |---------|  V /Alt |---------|                                          |---------|    M    |---------|   . >   |---------|
+   * | Z /Shft |---------|   Win   |---------|    B    |                                          |    N    |---------'         `---------| @` /Shft|
    * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
-   * |         |---------'          |   Alt   |,---------.                                     ,---------.                                |  全-半  |
-   * `---------'                    `---------'|MOUSE/NUM|,---------.               ,---------.| Ent/FNC |                                `---------'
-   *                                           `---------'|  Bkspc  |               |  Space  |`---------'
+   * |         |---------'          |MOUSE/NUM|,---------.                                     ,---------.                                |  全-半  |
+   * `---------'                    `---------'|　Space  |,---------.               ,---------.| Spc/FNC |                                `---------'
+   *                                           `---------'|  Bkspc  |               |  Enter  |`---------'
    *                                                      `---------'               `---------'
    */
   [_MAIN] = LAYOUT_right_ball(
-    KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                                    KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     ,\
+    CT(KC_Q) , KC_W     , KC_E     , KC_R     , KC_T     ,                                    KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     ,\
     CT(KC_A) , KC_S     , KC_D     , KC_F     , KC_G     ,                                    KC_H     , KC_J     , KC_K     , KC_L     , CTL_SCLN ,\
-    ST(KC_Z) , KC_X     , KC_C     , KC_V     , KC_B     ,                                    KC_N     , KC_M     , KC_COMM  , KC_DOT   , ST(KC_SLSH) ,\
-    XXXXXXX  , XXXXXXX  , WM_LGUI  , KC_LALT  , LT_NM_MS , KC_BSPC  ,              KC_SPC   , LT(_FNC,KC_ENT),                            WM_ZHTG   \
+    ST(KC_Z) , KC_X     , KC_C     , AT(KC_V) , KC_B     ,                                    KC_N     , KC_M     , KC_COMM  , KC_DOT   , ST(JP_AT),\
+    XXXXXXX  , XXXXXXX  , WM_LGUI  , LT_NM_MS , KC_SPC   , KC_BSPC  ,              KC_ENT   , LT(_FNC,KC_SPC),                            WM_ZHTG   \
   ),
 
-  /* MOUSE  
+  /* ,,
    *                     ,---------.                                                                                  ,---------.
-   *           ,---------|CPI-1000 |---------.                                                              ,---------|         |---------.
-   * ,---------|         |---------|CPI+1000 |---------.                                          ,---------|         |---------|         |---------.
-   * |ResetConf|---------| CPI-100 |---------|SaveConf |                                          |         |---------| ClickLt |---------|         |
-   * |---------|         |---------| CPI+100 |---------|                                          |---------| Forward |---------| ClickRt |---------|
-   * |  Ctrl   |---------|         |---------|         |                                          |         |---------|ScrlMode |---------|         |
-   * |---------|         |---------|         |---------|                                          |---------|  Back   |---------|         |---------|
-   * |  Shift  |---------|    v    |---------|         |                                          |         |---------'         `---------|         |
+   *           ,---------| AML-50  |---------.                                                              ,---------|         |---------.
+   * ,---------|         |---------| AML+50  |---------.                                          ,---------|         |---------|         |---------.
+   * |ResetConf|---------|         |---------|TogAutoMS|                                          |         |---------| ClickLt |---------|  MAIN   |
+   * |---------|         |---------|         |---------|                                          |---------| Forward |---------| ClickRt |---------|
+   * |  Ctrl   |---------|    C    |---------|         |                                          |         |---------|ScrlMode |---------|         |
+   * |---------|         |---------|   Alt   |---------|                                          |---------|  Back   |---------|         |---------|
+   * |  Shift  |---------|    v    |---------|         |                                          |Precision|---------'         `---------|         |
    * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
-   * |         |---------'          |    v    |,---------.                                     ,---------.                                |         |
-   * `---------'                    `---------'|  MAIN   |,---------.               ,---------.|  MAIN   |                                `---------'
-   *                                           `---------'|         |               |         |`---------'
+   * |         |---------'          |  MAIN   |,---------.                                     ,---------.                                |         |
+   * `---------'                    `---------'|    v    |,---------.               ,---------.|    v    |                                `---------'
+   *                                           `---------'|    v    |               |    v    |`---------'
    *                                                      `---------'               `---------'
    */
   [_MOUSE] = LAYOUT_right_ball(
-    KBC_RST  , XXXXXXX  , CPI_D1K  , CPI_I1K  , KBC_SAVE ,                                    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,\
-    WM_LCTL  , XXXXXXX  , CPI_D100 , CPI_I100 , XXXXXXX  ,                                    XXXXXXX  , WM_WFWD  , MS_BTN1  , MS_BTN2  , XXXXXXX  ,\
-    KC_LSFT  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,                                    XXXXXXX  , WM_WBAK  , SCRL_MO  , XXXXXXX  , XXXXXXX  ,\
-    XXXXXXX  , XXXXXXX  , _______  , _______  , MAIN     , XXXXXXX  ,              XXXXXXX ,  MAIN     ,                                  XXXXXXX   \
+    KBC_RST  , XXXXXXX  , AML_D50  , AML_I50  , AML_TO   ,                                    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , MAIN     ,\
+    WM_LCTL  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,                                    XXXXXXX  , WM_WFWD  , MS_BTN1  , MS_BTN2  , XXXXXXX  ,\
+    KC_LSFT  , XXXXXXX  , KC_C     , KC_LALT  , XXXXXXX  ,                                   MS_PRCS_M , WM_WBAK  , SCRL_MO  , XXXXXXX  , XXXXXXX  ,\
+    XXXXXXX  , XXXXXXX  , _______  , MAIN     , _______  , _______  ,              _______ ,  _______  ,                                  XXXXXXX   \
   ),
 
   /* NUMBERS
@@ -196,6 +202,24 @@ bool TOG_STATUS_ZENHAN = false;   // true: 全角, false: 半角
 // キーレイアウト(Windows/Mac)切り替え用
 bool TOG_STATUS_WINMAC = false;   // true: Mac, false: Windows
 
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+// 自動マウスレイヤ中に押してもレイヤを解除しないキー
+// (MS_BTN*, 標準の修飾キー, SCRL_MO は QMK/keyball 側で処理済み)
+bool is_mouse_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case KBC_RST:  case KBC_SAVE:
+        case CPI_I100: case CPI_D100: case CPI_I1K: case CPI_D1K:
+        case AML_TO:   case AML_I50:  case AML_D50:
+        case WM_WBAK:  case WM_WFWD:
+        case WM_LCTL:  case WM_LGUI:  case KC_LSFT: case KC_LALT:
+        case MS_BTN1:  case MS_BTN2:  case SCRL_MO:
+        case KC_C:     case KC_SPC:   case KC_BSPC: case KC_ENT:
+        case MS_PRCS_M:
+            return true;
+    }
+    return false;
+}
+#endif
 
 // Custom Keycodes Setting
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -207,6 +231,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case MAIN:
       if (record->event.pressed) {
         // set_single_persistent_default_layer(_MAIN);
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+        if (get_auto_mouse_toggle()) auto_mouse_toggle();   // 自動マウスレイヤの固定を解除
+#endif
         layer_move(_MAIN);  // MAINだけにする（恒久）
       }
       return false;
@@ -241,7 +268,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // LT(_NUMS._MOUSE)
     case LT_NM_MS:
       if (record->tap.count) {
-        if (record->event.pressed) layer_move(_MOUSE);
+        if (record->event.pressed) {
+          layer_move(_MOUSE);
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+          if (!get_auto_mouse_toggle()) auto_mouse_toggle(); // 手動で入ったときは自動解除しないよう固定
+#endif
+        }
         return false;
       }
       break;
@@ -470,15 +502,55 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
 
     /*********************************
+     * Mouse key                     *
+     *********************************/
+    // Mouse Precision Mode(CPI:100)
+    case MS_PRCS_M:
+      if (record->event.pressed) {
+        keyball_set_cpi(keyball_get_cpi() == DEFAULT_CPI ? PRECISION_CPI : DEFAULT_CPI);  // CPI切替
+      }
+      return false;
+      break;
+    // Momentary scroll mode
+    case SCRL_MO:
+      if (record->event.pressed)  keyball_set_cpi(PRECISION_CPI);   // スクロール中はCPI 100
+      else                        keyball_set_cpi(DEFAULT_CPI);     // 離したら元に戻す
+      return true;
+      break;
+    // Keyball configuration: reset to default
+#   ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+    case KBC_RST:
+      if (!record->event.pressed) {
+        set_auto_mouse_enable(true);                              // ライブラリが押下時にOFFにした後、ONに戻す
+        keyrecord_t save = {.event = {.pressed = true, .time = timer_read()}};
+        process_record_kb(KBC_SAVE, &save);                        // ライブラリのKBC_SAVE処理でEEPROMへ保存
+      }
+      return true;                                                // 押下時のリセット処理はライブラリに任せる
+#   endif
+    /*********************************
      * Microsoft Teams short cut key *
      *********************************/
     // Mic Mute on Microsoft Teams: Control + Shift + M
     case TMS_MICMT:
-      if (record->event.pressed) {
-        SEND_STRING(SS_LCTL(SS_LSFT("m")));
-      }
-      return false;
-      break;
+    if (record->event.pressed) {
+      SEND_STRING(SS_LCTL(SS_LSFT("m")));
+    }
+    return false;
+    break;
+
+    /*********************************
+     * LED RGM Pattern.              *
+     *********************************/
+    case RGB_M_P:  if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);    return false;
+    case RGB_M_B:  if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_BREATHING);       return false;
+    case RGB_M_R:  if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_RAINBOW_MOOD);    return false;
+    case RGB_M_SW: if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_RAINBOW_SWIRL);   return false;
+    case RGB_M_SN: if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_SNAKE);           return false;
+    case RGB_M_K:  if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_KNIGHT);          return false;
+    case RGB_M_X:  if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_CHRISTMAS);       return false;
+    case RGB_M_G:  if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_STATIC_GRADIENT); return false;
+    case RGB_M_T:  if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_RGB_TEST);        return false;
+    case RGB_M_TW: if (record->event.pressed) rgblight_mode(RGBLIGHT_MODE_TWINKLE);         return false;
 
   // End of switch(keycode)
   }
@@ -492,5 +564,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 void oledkit_render_info_user(void) {
     keyball_oled_render_keyinfo();
     keyball_oled_render_ballinfo();
+    keyball_oled_render_layerinfo();
 }
 #endif
