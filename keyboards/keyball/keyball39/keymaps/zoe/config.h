@@ -21,15 +21,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #ifdef RGBLIGHT_ENABLE
-#    define RGBLIGHT_EFFECT_BREATHING
+// #  define RGBLIGHT_EFFECT_BREATHING   // 容量節約のため無効 (Flow Tap 用)
 #    define RGBLIGHT_EFFECT_RAINBOW_MOOD
 #    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
-#    define RGBLIGHT_EFFECT_SNAKE
-#    define RGBLIGHT_EFFECT_KNIGHT
+// #  define RGBLIGHT_EFFECT_SNAKE   // 容量節約のため無効 (Flow Tap 用)
+// #  define RGBLIGHT_EFFECT_KNIGHT   // 容量節約のため無効 (Flow Tap 用)
 #    define RGBLIGHT_EFFECT_CHRISTMAS
 #    define RGBLIGHT_EFFECT_STATIC_GRADIENT
 #    define RGBLIGHT_EFFECT_RGB_TEST
-#    define RGBLIGHT_EFFECT_ALTERNATING
+// #  define RGBLIGHT_EFFECT_ALTERNATING   // 容量節約のため無効 (Flow Tap 用)
 #    define RGBLIGHT_EFFECT_TWINKLE
 #endif
 
@@ -40,7 +40,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define POINTING_DEVICE_AUTO_MOUSE_ENABLE
 #define AUTO_MOUSE_DEFAULT_LAYER 1  // = _MOUSE (keymap.c の layer_number と一致させること)
 #define PERMISSIVE_HOLD
-#define KEYBALL_CPI_DEFAULT 1000
-#define KEYBALL_CPI_PRECISION 300
+#define KEYBALL_CPI_DEFAULT 700
+#define KEYBALL_CPI_PRECISION 100
 #define AUTO_MOUSE_TIME 550
 
+#define NO_ACTION_ONESHOT
+#define KEYBALL_OLED_PRESSING_KEYS_DISABLE  // 押下中キー表示(ライブラリの keyinfo 用)は使わないので無効化
+// mod-tap (Ctrl/Shift/Alt) は、文字入力中以外は「他のキーを押したら即 修飾キー」(keymap.c の get_hold_on_other_key_press)
+#define HOLD_ON_OTHER_KEY_PRESS_PER_KEY
+// Flow Tap: 直前のキー操作(押す・離す)からこの時間(ms)未満に押した mod-tap は、押した瞬間に文字として確定 (Spc/NUM は対象外)
+#define FLOW_TAP_TERM 100
+// タップ直後の長押しをキーの連打にするかをキーごとに決める (keymap.c の get_quick_tap_term。Ent/FNC と Spc/NUM は連打にしない)
+#define QUICK_TAP_TERM_PER_KEY
+// スクロールの向き固定: 1 = 移植前の Keyball と同じ（基本は縦、横に大きく動かすと横スクロール）
+//   ライブラリの既定値 2 は「縦のみ/横のみ/自由」の切替式で、初期状態の縦のみだと横スクロールが一切効かない
+#define KEYBALL_SCROLLSNAP_ENABLE 1
+// 右手の OLED に Ball・CPI・AML を表示するため、左手から右手へ送る通信 (keymap.c の oled_sync)
+#define SPLIT_TRANSACTION_IDS_USER USER_OLED_SYNC
