@@ -1,0 +1,1021 @@
+/*
+JISキーボード
+*/
+
+#include QMK_KEYBOARD_H
+
+#include "quantum.h"
+#include "keymap_japanese.h"    // Japanese key-mapping
+#include "keycode_revival.h"    // 失われたキーに復活の呪文
+
+#define _FNC _FUNCTIONS
+#define AT_MOUSE LALT_T(KC_F23)          // Tap: MOUSEへ移動(process_record_userで処理), Hold: Alt
+#define AT_MS AT_MOUSE
+#define NM_SPC LT(_NUMBERS, KC_SPC)       // Tap: Space, Hold: NUMBERS
+// #define LT_NUMBERS_MAIN  LT(_NUMBERS, KC_F24)
+// #define LT_NM_MN LT_NUMBERS_MAIN
+#define CT(kc) LCTL_T(kc)
+#define ST(kc) LSFT_T(kc)
+#define AT(kc) LALT_T(kc)
+#define CTL_SCLN RCTL_T(KC_SCLN)
+#define AT_RBRC LALT_T(KC_BSLS)         // Tap: ] (JS_RBRC の処理で常に ]), Hold: Alt  ※mod-tap にはカスタムキーを直接指定できないため
+// #define SET_WIN AG_SWAP
+// #define SET_MAC AG_NORM
+
+// CPI は config.h の KEYBALL_CPI_DEFAULT / KEYBALL_CPI_PRECISION を 100 単位にして使う(値の二重管理をしない)
+#define DEFAULT_CPI   (KEYBALL_CPI_DEFAULT / 100)
+#define PRECISION_CPI (KEYBALL_CPI_PRECISION / 100)
+
+enum layer_number {
+    _MAIN = 0,
+    _MOUSE,
+    _NUMBERS,
+    _FUNCTIONS,
+    _ADJUST1,
+    _ADJUST2,
+};
+
+enum custom_keycodes {
+  // Keymap Layer
+  // MAIN = SAFE_RANGE,  // _MAIN: Main Layer
+  MAIN = KEYBALL_SAFE_RANGE,  // _MAIN: Main Layer
+  // MOUSE,                      // _MOUSE: Mouse Layer
+  // NUMS,                       // _NUMS: Numbers Layer
+  // FUNCS,                      // _FUNCS: Functions Layer
+  // ADJUST1,                    // _ADJUST1: Active by _NUMBERS & _FUNCTIONS
+  // ADJUST2,                    // _ADJUST2: DUMMY
+  // // L-ayer, T-ap for Layers
+  // AT_MS,               // Tap:Move Layer to _MOUSE, Hold:Alt
+  // LT_NM_MN,            // Tap:Move Layer to _MAIN, Hold:Layer On _NUMBERS
+  // Set Key Layout for Windows/Mac
+  SET_WIN,
+  SET_MAC,
+  // Same Key on Windows & Mac
+  WM_ZHTG,  // Win:全角/半角, Mac:かな/英数
+  WM_LGUI,  // Win:Windows, Mac:Control
+  WM_LCTL,  // Win:Control, Mac:Command
+  WM_WBAK,  // Win:Alt+←, Mac:Command+[
+  WM_WFWD,  // Win:Alt+→, Mac:Command+]
+  // JIS One-Symbol Keys
+  JS_LPRN,  // (
+  JS_RPRN,  // )
+  JS_LCBR,  // {
+  JS_RCBR,  // }
+  JS_LBRC,  // [
+  JS_RBRC,  // ]
+  JS_UNDS,  // _
+  // like US key on JIS leyout
+  JU_SCLN,  // ; and :
+  JU_QUOT,  // ' and "
+  // Original key
+  // MY_CLCME, // - and =
+  MY_CLCPB, // + and *
+  // Mouse key
+  MS_PRCS_M, // Mouse Precision Mode(CPI: KEYBALL_CPI_DEFAULT ⇔ KEYBALL_CPI_PRECISION)
+  // Microsoft Teams short cut key
+  TMS_MICMT, // Mic Mute on Microsoft Teams: Control + Shift + M
+  // NUMBERS layer
+  JS_MINS,   // 常に - (Shift を押していても -)
+  JS_0EQL,   // 0、Shift で =
+
+};
+
+// clang-format off
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  /* MAIN
+   *                     ,---------.                                                                                  ,---------.
+   *           ,---------|    E    |---------.                                                              ,---------|    I    |---------.
+   * ,---------|    W    |---------|    R    |---------.                                          ,---------|    U    |---------|    O    |---------.
+   * | Q /Ctrl |---------|    D    |---------|    T    |                                          |    Y    |---------|    K    |---------|    P    |
+   * |---------|    S    |---------|    F    |---------|                                          |---------|    J    |---------|    L    |---------|
+   * | A /Ctrl |---------|    C    |---------|    G    |                                          |    H    |---------|   , <   |---------| ;: /Ctrl|
+   * |---------|    X    |---------|  V /Alt |---------|                                          |---------|    M    |---------|   . >   |---------|
+   * | Z /Shft |---------|   Win   |---------|    B    |                                          |    N    |---------'         `---------| @` /Shft|
+   * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
+   * |         |---------'          |MOUSE/Alt|,---------.                                     ,---------.                                |  全-半  |
+   * `---------'                    `---------'| Spc/NUM |,---------.               ,---------.| Ent/FNC |                                `---------'
+   *                                           `---------'|  Bkspc  |               |  Space  |`---------'
+   *                                                      `---------'               `---------'
+   */
+  [_MAIN] = LAYOUT_right_ball(
+    CT(KC_Q) , KC_W     , KC_E     , KC_R     , KC_T     ,                                    KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     ,\
+    CT(KC_A) , KC_S     , KC_D     , KC_F     , KC_G     ,                                    KC_H     , KC_J     , KC_K     , KC_L     , CTL_SCLN ,\
+    ST(KC_Z) , KC_X     , KC_C     , AT(KC_V) , KC_B     ,                                    KC_N     , KC_M     , KC_COMM  , KC_DOT   , ST(JP_AT),\
+    XXXXXXX  , XXXXXXX  , WM_LGUI  , AT_MS    , NM_SPC   , KC_BSPC  ,              KC_SPC   , LT(_FNC,KC_ENT),                            WM_ZHTG   \
+  ),
+
+  /* ,,
+   *                     ,---------.                                                                                  ,---------.
+   *           ,---------|         |---------.                                                              ,---------|         |---------.
+   * ,---------|         |---------|         |---------.                                          ,---------|         |---------|         |---------.
+   * |ResetConf|---------|         |---------|         |                                          |         |---------| ClickLt |---------|  MAIN   |
+   * |---------|         |---------|         |---------|                                          |---------| Forward |---------| ClickRt |---------|
+   * |  Ctrl   |---------|    C    |---------|         |                                          |         |---------|ScrlMode |---------|         |
+   * |---------|         |---------|  V /Alt |---------|                                          |---------|  Back   |---------|         |---------|
+   * |  Shift  |---------|    v    |---------|         |                                          |Precision|---------'         `---------|         |
+   * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
+   * |         |---------'          |  MAIN   |,---------.                                     ,---------.                                |         |
+   * `---------'                    `---------'|    v    |,---------.               ,---------.|    v    |                                `---------'
+   *                                           `---------'|    v    |               |    v    |`---------'
+   *                                                      `---------'               `---------'
+   */
+  [_MOUSE] = LAYOUT_right_ball(
+    KBC_RST  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,                                    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , MAIN     ,\
+    WM_LCTL  , XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,                                    XXXXXXX  , WM_WFWD  , MS_BTN1  , MS_BTN2  , XXXXXXX  ,\
+    ST(KC_Z) , KC_X     , KC_C     , AT(KC_V) , XXXXXXX  ,                                   MS_PRCS_M , WM_WBAK  , SCRL_MO  , XXXXXXX  , XXXXXXX  ,\
+    XXXXXXX  , XXXXXXX  , _______  , MAIN     , _______  , _______  ,              _______ ,  _______  ,                                  XXXXXXX   \
+  ),
+
+  /* NUMBERS
+   *                     ,---------.                                                                                  ,---------.
+   *           ,---------|    (    |---------.                                                              ,---------|   8 (   |---------.
+   * ,---------|   Tab   |---------|    )    |---------.                                          ,---------|   7 '   |---------|   9 )   |---------.
+   * |   Esc   |---------|    {    |---------|    $    |                                          |   \ |   |---------|   5 %   |---------|   Del   |
+   * |---------|    _    |---------|    }    |---------|                                          |---------|   4 $   |---------|   6 &   |---------|
+   * |  Ctrl   |---------|    [    |---------|   @ `   |                                          |    -    |---------|   2 "   |---------|   + *   |
+   * |---------|         |---------|  ] /Alt |---------|                                          |---------|   1 !   |---------|   3 #   |---------|
+   * |  Shift  |---------|         |---------|    %    |                                          |   0 =   |---------'         `---------|   / ?   |
+   * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
+   * |         |---------'          |         |,---------.                                     ,---------.                                |   ^ ~   |
+   * `---------'                    `---------'|    v    |,---------.               ,---------.|    v    |                                `---------'
+   *                                           `---------'|         |               |    v    |`---------'
+   *                                                      `---------'               `---------'
+   */
+  [_NUMBERS] = LAYOUT_right_ball(
+    KC_ESC   , KC_TAB   , JS_LPRN  , JS_RPRN  , KC_DLR   ,                                    JP_YEN   , KC_7     , KC_8     , KC_9     , KC_DEL   ,\
+    WM_LCTL  , JS_UNDS  , JS_LCBR  , JS_RCBR  , JP_AT    ,                                    JS_MINS  , KC_4     , KC_5     , KC_6     , MY_CLCPB ,\
+    KC_LSFT  , XXXXXXX  , JS_LBRC  , AT_RBRC  , KC_PERC  ,                                    JS_0EQL  , KC_1     , KC_2     , KC_3     , KC_SLSH  ,\
+    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , _______  , XXXXXXX  ,              _______ ,  _______  ,                                  JP_CIRC   \
+  ),
+
+  /* FUNCTIONS
+   *                     ,---------.                                                                                  ,---------.
+   *           ,---------|   F2    |---------.                                                              ,---------|   ↑    |---------.
+   * ,---------|   Tab   |---------|   F3    |---------.                                          ,---------|  PgUp   |---------|  PgDw   |---------.
+   * |   Esc   |---------|   F6    |---------|   F4    |                                          |   F1    |---------|   ↓    |---------|   Del   |
+   * |---------|   F5    |---------|   F7    |---------|                                          |---------|   ←    |---------|   →    |---------|
+   * |  Ctrl   |---------|   F10   |---------|   F8    |                                          |  Home   |---------|   App   |---------|   End   |
+   * |---------|   F9    |---------|   F11   |---------|                                          |---------|         |---------|         |---------|
+   * |  Shift  |---------|    v    |---------|   F12   |                                          |         |---------'         `---------|         |
+   * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
+   * |         |---------'          |    v    |,---------.                                     ,---------.                                |         |
+   * `---------'                    `---------'|    v    |,---------.               ,---------.|    v    |                                `---------'
+   *                                           `---------'|    v    |               |         |`---------'
+   *                                                      `---------'               `---------'
+   */
+  [_FUNCTIONS] = LAYOUT_right_ball(
+    KC_ESC   , KC_TAB   , KC_F2    , KC_F3    , KC_F4    ,                                    KC_F1    , KC_PGUP  , KC_UP    , KC_PGDN  , KC_DEL   ,\
+    WM_LCTL  , KC_F5    , KC_F6    , KC_F7    , KC_F8    ,                                    KC_HOME  , KC_LEFT  , KC_DOWN  , KC_RGHT  , KC_END   ,\
+    KC_LSFT  , KC_F9    , KC_F10   , KC_F11   , KC_F12   ,                                    XXXXXXX  , XXXXXXX  , KC_APP   , XXXXXXX  , XXXXXXX  ,\
+    XXXXXXX  , XXXXXXX  , _______  , _______  , _______  , _______  ,              _______ ,  _______  ,                                  XXXXXXX   \
+  ),
+
+  /* ADJUST-1(NUMBERS+FUNCTIONS)
+   *                     ,---------.                                                                                  ,---------.
+   *           ,---------|  HUE-   |---------.                                                              ,---------|MdRainbow|---------.
+   * ,---------| WinMap  |---------|  HUE+   |---------.                                          ,---------|         |---------| MdSwirl |---------.
+   * |MdForward|---------|  SAT-   |---------|         |                                          |MdStatic |---------| MdGrad  |---------|         |
+   * |---------|         |---------|  SAT+   |---------|                                          |---------| MdXmac  |---------|MdRGBTest|---------|
+   * |MdReverce|---------| Bright- |---------|         |                                          |         |---------|         |---------|MdTwinkle|
+   * |---------|         |---------| Bright+ |---------|                                          |---------| MacMap  |---------|         |---------|
+   * |         |---------|         |---------|         |                                          |         |---------'         `---------|         |
+   * |---------|         |---------',--------`.--------'                                          `---------'                             |---------|
+   * |         |---------'          |         |,---------.                                     ,---------.                                | LED Tog |
+   * `---------'                    `---------'|    v    |,---------.               ,---------.|    v    |                                `---------'
+   *                                           `---------'|         |               |         |`---------'
+   *                                                      `---------'               `---------'
+   */
+  [_ADJUST1] = LAYOUT_right_ball(
+    UG_NEXT  , SET_WIN  , UG_HUED  , UG_HUEU  , XXXXXXX  ,                                    RGB_M_P  , XXXXXXX  , RGB_M_R  , RGB_M_SW , XXXXXXX  ,\
+    UG_PREV  , XXXXXXX  , UG_SATD  , UG_SATU  , XXXXXXX  ,                                    XXXXXXX  , RGB_M_X  , RGB_M_G  , RGB_M_T  , RGB_M_TW ,\
+    XXXXXXX  , XXXXXXX  , UG_VALD  , UG_VALU  , XXXXXXX  ,                                    XXXXXXX  , SET_MAC  , XXXXXXX  , XXXXXXX  , XXXXXXX  ,\
+    XXXXXXX  , XXXXXXX  , XXXXXXX  , XXXXXXX  , _______  , XXXXXXX  ,              XXXXXXX ,  _______  ,                                  UG_TOGG   \
+  ),
+
+};
+// clang-format on
+
+// Layers Setting
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+// MOUSE/Alt キーのタップで MOUSE に入っている間は AML を一時停止し、MOUSE を抜けたら元に戻す
+static bool aml_suspended = false;  // true: 一時停止中
+static bool aml_pref      = false;  // 一時停止前の AML の ON/OFF（復帰時に戻す値）
+#endif
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    // レイヤが切り替わったらスクロールモードを OFF にする (仕様)
+    keyball_set_scroll_mode(false);
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+    // MOUSE レイヤを抜けたら、一時停止していた AML を元の設定に戻す
+    if (aml_suspended && !layer_state_cmp(state, _MOUSE)) {
+        aml_suspended = false;
+        set_auto_mouse_enable(aml_pref);
+    }
+#endif
+    return update_tri_layer_state(state, _NUMBERS, _FUNCTIONS, _ADJUST1);
+}
+
+// 全角/半角切り替え用(Mac)
+bool TOG_STATUS_ZENHAN = false;   // true: 全角, false: 半角
+
+// キーレイアウト(Windows/Mac)切り替え用
+bool TOG_STATUS_WINMAC = false;   // true: Mac, false: Windows
+
+/*********************************
+ * 修飾キー (mod-tap) の判定      *
+ *********************************
+ * 文字キーと修飾キーを兼ねる mod-tap (A/Ctrl, Z/Shift, V/Alt など) は QMK の Flow Tap で判定する。
+ *  - 文字入力中 (直前の文字キーを押した・離した時から FLOW_TAP_TERM 未満) に押したとき:
+ *      押した瞬間に文字として確定する (遅延なし)。重ねて打っても修飾キーにならない ("zo" が "O" にならない)。
+ *  - それ以外のとき: 他のキーを押した瞬間に修飾キー (get_hold_on_other_key_press)。修飾キーを先に離しても効く。
+ * 「文字入力中」から外すもの (get_flow_tap_term):
+ *  - Spc/NUM: 「ゆー」のように文字の直後に NUMBERS レイヤの記号を打てるよう、Flow Tap の対象外 (今までどおり PERMISSIVE_HOLD)
+ *  - 直前がスペース: スペース直後の Ctrl/Alt を効かせる
+ *  - 直前のキーを Ctrl/Alt/GUI を押しながら押した (ショートカット直後): Ctrl+C → Ctrl+V を素早く打てる
+ *  - マトリクス (0,0) の Q/Ctrl: QMK 0.33.3 の不具合回避。Flow Tap で確定した (0,0) のキーは、
+ *    キーボードの定期処理 (位置が (0,0) 扱い) によって離した記録が消され、押しっぱなしになるため
+ * Shift 兼用キー (Z, @) は文字優先 (SHIFT_FLOW_TAP_TERM。スペースの直後も文字入力中として扱う)。
+ *   Shift として使うときは、直前のキーから少し間を空ける。
+ * MOUSE/Alt (タップ側 F23) と ] /Alt は QMK 標準の判定で Flow Tap の対象外。
+ */
+#define SHIFT_FLOW_TAP_TERM 250   // Shift 兼用キー (Z, @) の「文字入力中」の時間 (ms)
+static bool last_key_held;        // 最後に処理したキーがタップ/ホールドのキーで、ホールドだったか (OLED でホールド側の動作を表示する判定用)
+static bool last_press_shortcut;  // 直前のキーを Ctrl/Alt/GUI を押しながら押したか (process_record_user で更新)
+
+bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
+    // AT_MS (タップ: MOUSE へ移動) は、タップ直後にクリック等を押しても Alt にならないよう対象外
+    return IS_QK_MOD_TAP(keycode) && keycode != AT_MS;
+}
+
+uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_keycode) {
+    if (record->event.key.row == 0 && record->event.key.col == 0) return 0;       // (0,0) の不具合回避
+    if (keycode == NM_SPC) return 0;                                               // 文字の直後でも NUMBERS レイヤを使えるように
+    if (last_press_shortcut) return 0;                                             // ショートカットの直後
+    // Shift 兼用キー (Z, @) は文字優先: 直前の文字・スペースから SHIFT_FLOW_TAP_TERM 以内は必ず文字 ("ず" が "U" にならない)
+    if (IS_QK_MOD_TAP(keycode) && (QK_MOD_TAP_GET_MODS(keycode) & MOD_LSFT)) return is_flow_tap_key(prev_keycode) ? SHIFT_FLOW_TAP_TERM : 0;
+    if (IS_QK_MOD_TAP(keycode) && get_tap_keycode(prev_keycode) == KC_SPC) return 0;  // スペースの直後の修飾キー
+    if (is_flow_tap_key(keycode) && is_flow_tap_key(prev_keycode)) return FLOW_TAP_TERM;
+    return 0;
+}
+
+// Ent/FNC と Spc/NUM はタップ直後に押し続けても Enter/スペースの連打にせず、FUNCTIONS/NUMBERS レイヤにする
+uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == LT(_FNC, KC_ENT) || keycode == NM_SPC) return 0;
+    return QUICK_TAP_TERM;
+}
+
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+// 自動マウスレイヤ中に押してもレイヤを解除しないキー
+// (MS_BTN*, 標準の修飾キー, SCRL_MO は QMK/keyball 側で処理済み)
+bool is_mouse_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (!layer_state_is(_MOUSE)) return false;   // MOUSEレイヤ以外では通常キーとして扱う
+    switch (keycode) {
+        case KBC_RST:  case KBC_SAVE:
+        case CPI_I100: case CPI_D100: case CPI_I1K: case CPI_D1K:
+        case WM_WBAK:  case WM_WFWD:
+        case WM_LCTL:  case WM_LGUI:  case KC_LSFT: case ST(KC_Z): case KC_X: case AT(KC_V):
+        case MS_BTN1:  case MS_BTN2:  case SCRL_MO:
+        case KC_C:     case KC_ENT:
+        case MS_PRCS_M:
+            return true;
+    }
+    return false;
+}
+#endif
+
+// Custom Keycodes Setting
+#ifdef RGBLIGHT_ENABLE
+// LED発光パターンの先頭モード番号（モード番号の小さい順）。RGB_M_* キーの処理と OLED 表示で共用
+// config.h で有効にしているパターンだけを並べる (BREATHING/SNAKE/KNIGHT/ALTERNATING は容量節約のため無効)
+static const uint8_t rgb_mode_base[] PROGMEM = {
+    RGBLIGHT_MODE_STATIC_LIGHT, RGBLIGHT_MODE_RAINBOW_MOOD, RGBLIGHT_MODE_RAINBOW_SWIRL,
+    RGBLIGHT_MODE_CHRISTMAS, RGBLIGHT_MODE_STATIC_GRADIENT, RGBLIGHT_MODE_RGB_TEST,
+    RGBLIGHT_MODE_TWINKLE,
+};
+// RGB_M_P 〜 RGB_M_TW の各キーが rgb_mode_base の何番目か (0xFF: 無効にしたパターン)
+static const uint8_t rgb_key_to_idx[] PROGMEM = {
+    0,    // RGB_M_P  STATIC
+    0xFF, // RGB_M_B  BREATHING (無効)
+    1,    // RGB_M_R  RAINBOW_MOOD
+    2,    // RGB_M_SW RAINBOW_SWIRL
+    0xFF, // RGB_M_SN SNAKE (無効)
+    0xFF, // RGB_M_K  KNIGHT (無効)
+    3,    // RGB_M_X  CHRISTMAS
+    4,    // RGB_M_G  STATIC_GRADIENT
+    5,    // RGB_M_T  RGB_TEST
+    6,    // RGB_M_TW TWINKLE
+};
+#endif
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  // Flow Tap 判定用 (get_flow_tap_term): このキーを Ctrl/Alt/GUI を押しながら押したか
+  if (record->event.pressed) last_press_shortcut = (get_mods() & MOD_MASK_CAG) != 0;
+  // OLED 表示用。タップ/ホールドのキーは tap.count が 0 ならホールド (押下・解放どちらも同じ判定になる)
+  if (IS_QK_MOD_TAP(keycode) || IS_QK_LAYER_TAP(keycode)) last_key_held = !record->tap.count;
+  else if (record->event.pressed)                         last_key_held = false;
+  switch (keycode) {
+    /*****************************
+     * Keymap Layer              *
+     *****************************/
+    // MAIN
+    case MAIN:
+      if (record->event.pressed) {
+        // set_single_persistent_default_layer(_MAIN);
+        layer_move(_MAIN);  // MAINだけにする（恒久）
+      }
+      return false;
+      break;
+    // // NUMBERS
+    // case NUMS:
+    //   if (record->event.pressed) {
+    //     layer_on(_NUMBERS);
+    //     update_tri_layer(_NUMBERS, _FUNCTIONS, _ADJUST1);
+    //   } else {
+    //     layer_off(_NUMBERS);
+    //     update_tri_layer(_NUMBERS, _FUNCTIONS, _ADJUST1);
+    //   }
+    //   return false;
+    //   break;
+    // // FUNCTIONS
+    // case FUNCS:
+    //   if (record->event.pressed) {
+    //     layer_on(_FUNCTIONS);
+    //     update_tri_layer(_NUMBERS, _FUNCTIONS, _ADJUST1);
+    //   } else {
+    //     layer_off(_FUNCTIONS);
+    //     update_tri_layer(_NUMBERS, _FUNCTIONS, _ADJUST1);
+    //   }
+    //   return false;
+    //   break;
+    // // MOUSE
+    // case MOUSE:
+    //   if (record->event.pressed) layer_move(_MOUSE);  // MOUSEだけにする（恒久）
+    //   return false;
+    //   break;
+    // Tap: MOUSEへ移動 / Hold: Alt (LALT_T)
+    case AT_MS:
+      if (record->tap.count) {
+        if (record->event.pressed) {
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+          if (!aml_suspended) {                 // 手動で MOUSE に入る間は AML を一時停止
+            aml_pref      = get_auto_mouse_enable();
+            aml_suspended = true;
+          }
+          set_auto_mouse_enable(false);
+#endif
+          layer_move(_MOUSE);
+        }
+        return false;
+      }
+      break;
+    // // LT(_NUMS._MAIN)
+    // case LT_NM_MN:
+    //   if (record->tap.count) {
+    //     if (record->event.pressed) layer_move(_MAIN);
+    //   }
+    //   return false;
+    //   break;
+
+    /**********************************
+     * Set Key Layout for Windows/Mac *
+     **********************************/
+    // Set Windows Layout
+    case SET_WIN:
+      if (record->event.pressed) {
+        TOG_STATUS_WINMAC = false;    // Change Key Layout for Windows
+      }
+      return false;
+      break;
+    // Set Mac Layout
+    case SET_MAC:
+      if (record->event.pressed) {
+        TOG_STATUS_WINMAC =  true;    // Change Key Layout for Mac
+      }
+      return false;
+      break;
+
+    /*****************************
+     * Same Key on Windows & Mac *
+     *****************************/
+    // Winows:全角/半角キー, Mac:かなキー/英数キー
+    case WM_ZHTG:
+      if (record->event.pressed) {
+        // Shift, Ctrlが押されていても、全角/半角の切り替えを行えるようにする
+        uint8_t mods = get_mods();
+        clear_mods();
+        // Windows/Macのキーマップが切り替わっているか判断し、全角/英数切替する
+        // if(!TOG_STATUS_WINMAC) SEND_STRING(SS_LALT("`")); // for Windows
+        if(!TOG_STATUS_WINMAC)    tap_code(JP_ZKHK);   // for Windows
+        else {                                        // for Mac
+          TOG_STATUS_ZENHAN = !TOG_STATUS_ZENHAN;
+          if (TOG_STATUS_ZENHAN) tap_code(KC_LNG1);   // KANA: 全角
+          else                   tap_code(KC_LNG2);   // EISU：半角
+        }
+        set_mods(mods);
+        send_keyboard_report();
+      }
+      return false;
+      break;
+    // Winows:Windowsキー, Mac:Controlキー
+    case WM_LGUI:
+      if (record->event.pressed) {
+        if(!TOG_STATUS_WINMAC) register_code(KC_LGUI);    // for Windows
+        else                   register_code(KC_LCTL);    // for Mac
+      }
+      else {
+        if(!TOG_STATUS_WINMAC) unregister_code(KC_LGUI);  // for Windows
+        else                   unregister_code(KC_LCTL);  // for Mac
+      }
+      return false;
+      break;
+    // Windows: Control, Mac: Command
+    case WM_LCTL:
+      if (record->event.pressed) {
+        if(!TOG_STATUS_WINMAC) register_code(KC_LCTL);    // for Windows
+        else                   register_code(KC_LGUI);    // for Mac
+      }
+      else {
+        if(!TOG_STATUS_WINMAC) unregister_code(KC_LCTL);  // for Windows
+        else                   unregister_code(KC_LGUI);  // for Mac
+      }
+      return false;
+      break;
+    /// Win:Alt+←, Mac:Command+[
+    case WM_WBAK:
+      if (record->event.pressed) {
+        if(!TOG_STATUS_WINMAC) tap_code16(A(KC_LEFT));    // for Windows
+        else                   tap_code16(G(KC_RBRC));    // for Mac
+      }
+      return false;
+      break;
+    // Win:Alt+→, Mac:Command+]
+    case WM_WFWD:
+      if (record->event.pressed) {
+        if(!TOG_STATUS_WINMAC) tap_code16(A(KC_RGHT));    // for Windows
+        else                  tap_code16(G(KC_BSLS));    // for Mac
+      }
+      return false;
+      break;
+
+    /*****************************
+     * JIS One-Symbol Keys       *
+     *****************************/
+    // Always JIS (
+    case JS_LPRN:
+      if (record->event.pressed) {
+        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
+        if (is_mod_shift) tap_code(KC_8);
+        else              tap_code16(S(KC_8));
+        // else              {register_code16(S(KC_8));unregister_code16(S(KC_8));}
+        // else              {register_mods(MOD_BIT(KC_LSFT));register_code(KC_8);unregister_code(KC_8);unregister_mods(MOD_BIT(KC_LSFT));}
+      }
+      return false;
+      break;
+    // Always JIS )
+    case JS_RPRN:
+      if (record->event.pressed) {
+        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
+        if (is_mod_shift) tap_code(KC_9);
+        else              tap_code16(S(KC_9));
+      }
+      return false;
+      break;
+    // Always JIS {
+    case JS_LCBR:
+      if (record->event.pressed) {
+        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
+        if (is_mod_shift) tap_code(KC_RBRC);
+        else              tap_code16(S(KC_RBRC));
+      }
+      return false;
+      break;
+    // Always JIS }
+    case JS_RCBR:
+      if (record->event.pressed) {
+        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
+        if (is_mod_shift) tap_code(KC_BSLS);
+        else              tap_code16(S(KC_BSLS));
+      }
+      return false;
+      break;
+    // Always JIS [
+    case JS_LBRC:
+      if (record->event.pressed) {
+        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
+        if (is_mod_shift) unregister_mods(MOD_BIT(KC_LSFT));
+        tap_code(KC_RBRC);
+        if (is_mod_shift)   register_mods(MOD_BIT(KC_LSFT));
+      }
+      return false;
+      break;
+    // Always JIS ]
+    case JS_RBRC:
+      if (record->event.pressed) {
+        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
+        if (is_mod_shift) unregister_mods(MOD_BIT(KC_LSFT));
+        tap_code(KC_BSLS);
+        if (is_mod_shift)   register_mods(MOD_BIT(KC_LSFT));
+      }
+      return false;
+      break;
+    // Always JIS _
+    case JS_UNDS:
+      if (record->event.pressed) {
+        bool is_mod_shift = (keyboard_report->mods & MOD_BIT(KC_LSFT));  // shifted
+        if (is_mod_shift) unregister_mods(MOD_BIT(KC_LSFT));
+        if(!TOG_STATUS_WINMAC) tap_code16(S(KC_INT1));  // for Windows
+        else                   tap_code16(S(KC_MINS));  // for Mac
+        if (is_mod_shift)   register_mods(MOD_BIT(KC_LSFT));
+      }
+      return false;
+      break;
+
+    /*****************************
+     * like US key on JIS leyout *
+     *****************************/
+    // ; and : on JIS
+    case JU_SCLN:
+      if (record->event.pressed) {
+        if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {  // shifted
+          unregister_mods(MOD_BIT(KC_LSFT));
+          tap_code(JP_COLN);     // :
+        register_mods(MOD_BIT(KC_LSFT));
+        } else {
+          tap_code(JP_SCLN);     // ;
+        }
+      }
+      return false;
+      break;
+    // ' and " on JIS
+    case JU_QUOT:
+      if (record->event.pressed) {
+        if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {  // shifted
+          tap_code(JP_2);      // "
+        } else {
+          tap_code16(S(JP_7));  // '
+        }
+      }
+      return false;
+      break;
+
+    /*****************************
+     * Original key              *
+     *****************************/
+    // // - and =
+    // case MY_CLCME:
+    //   if (record->event.pressed) {
+    //     if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {  // shifted
+    //       tap_code(KC_PEQL);     // =
+    //     } else {
+    //       tap_code(KC_PMNS);     // -
+    //     }
+    //   }
+    //   return false;
+    //   break;
+    // + and *
+    case MY_CLCPB:
+      if (record->event.pressed) {
+        if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {  // shifted
+          tap_code(KC_PAST);     // *
+        } else {
+          tap_code(KC_PPLS);     // +
+        }
+      }
+      return false;
+      break;
+
+    /*********************************
+     * M-od, T-ap                    *
+     *********************************/
+    // CTL_SCLN: Tap: ; と :(JU_SCLN), Hold: Ctrl
+    case CTL_SCLN:
+      if (record->tap.count) return process_record_user(JU_SCLN, record);  // タップ時はJU_SCLNの処理に任せる
+      break;
+    // AT_RBRC: Tap: ](JS_RBRC), Hold: Alt
+    case AT_RBRC:
+      if (record->tap.count) return process_record_user(JS_RBRC, record);  // タップ時はJS_RBRCの処理に任せる
+      break;
+
+    /*********************************
+     * Mouse key                     *
+     *********************************/
+    // Mouse Precision Mode: KEYBALL_CPI_DEFAULT と KEYBALL_CPI_PRECISION を切り替え (config.h)
+    case MS_PRCS_M:
+      // Ctrl/Shift/Alt/GUI を押しているときは N として働く (MOUSE レイヤ中の Ctrl+Shift+N など)
+      if (get_mods()) {
+        if (record->event.pressed) register_code(KC_N);
+        else                       unregister_code(KC_N);
+        return false;
+      }
+      if (record->event.pressed) {
+        keyball_set_cpi(keyball_get_cpi() == DEFAULT_CPI ? PRECISION_CPI : DEFAULT_CPI);  // CPI切替
+      }
+      return false;
+      break;
+    // Momentary scroll mode
+    case SCRL_MO:
+      if (record->event.pressed)  keyball_set_cpi(PRECISION_CPI);   // スクロール中は KEYBALL_CPI_PRECISION
+      else                        keyball_set_cpi(DEFAULT_CPI);     // 離したら KEYBALL_CPI_DEFAULT に戻す
+      return true;
+      break;
+    // Keyball configuration: reset to default
+#   ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+    case KBC_RST:
+      if (!record->event.pressed) {
+        if (aml_suspended) aml_pref = true;                       // 手動MOUSE中なら、抜けた後に戻す値もONに
+        set_auto_mouse_enable(true);                              // ライブラリが押下時にOFFにした後、ONに戻す
+        keyrecord_t save = {.event = {.pressed = true, .time = timer_read()}};
+        process_record_kb(KBC_SAVE, &save);                        // ライブラリのKBC_SAVE処理でEEPROMへ保存
+        if (aml_suspended) set_auto_mouse_enable(false);          // 保存後は一時停止に戻す
+      }
+      return true;                                                // 押下時のリセット処理はライブラリに任せる
+    // 設定保存: 手動MOUSE中は、一時停止中のOFFではなく元の設定(aml_pref)を保存する
+    //   ライブラリは押下時に保存するので、押下時に元の設定へ戻し、離した時に一時停止へ戻す
+    case KBC_SAVE:
+      if (aml_suspended) set_auto_mouse_enable(record->event.pressed ? aml_pref : false);
+      return true;
+    // AML ON/OFF: 手動MOUSE中(一時停止中)は、MOUSEを抜けた後に戻す設定の方を切り替える
+    case AML_TO:
+      if (aml_suspended) {
+        if (record->event.pressed) aml_pref = !aml_pref;
+        return false;
+      }
+      return true;
+#   endif
+    // 常に - (Shift を押していても -)
+    case JS_MINS:
+      if (record->event.pressed) {
+        uint8_t shift = get_mods() & MOD_MASK_SHIFT;
+        if (shift) unregister_mods(shift);
+        tap_code(KC_MINS);
+        if (shift) register_mods(shift);
+      }
+      return false;
+    // 0、Shift を押しているときは = (JIS の = は Shift + -)
+    case JS_0EQL:
+      if (record->event.pressed) tap_code((get_mods() & MOD_MASK_SHIFT) ? KC_MINS : KC_0);
+      return false;
+    /*********************************
+     * Microsoft Teams short cut key *
+     *********************************/
+    // Mic Mute on Microsoft Teams: Control + Shift + M
+    case TMS_MICMT:
+    if (record->event.pressed) {
+      tap_code16(C(S(KC_M)));   // SEND_STRINGは文字変換表ごと取り込まれ容量を食うため tap_code16 で送る
+    }
+    return false;
+    break;
+
+    /*********************************
+     * LED RGM Pattern.              *
+     *********************************/
+#ifdef RGBLIGHT_ENABLE
+    // RGB_M_P(STATIC) 〜 RGB_M_TW(TWINKLE) は QMK 側で処理されないので、ここでモードを切り替える
+    case RGB_MODE_PLAIN ... RGB_MODE_TWINKLE:
+      if (record->event.pressed) {
+        uint8_t i = pgm_read_byte(&rgb_key_to_idx[keycode - RGB_MODE_PLAIN]);
+        if (i != 0xFF) rgblight_mode(pgm_read_byte(&rgb_mode_base[i]));
+      }
+      return false;
+#endif
+
+  // End of switch(keycode)
+  }
+  return true;
+}
+
+#if defined(OLED_ENABLE) && defined(RGBLIGHT_ENABLE)
+// rgb_mode_base と同じ並び
+static const char rgb_mode_name[][9] PROGMEM = {
+    "STATIC", "RAINBOW", "SWIRL", "XMAS", "GRADIENT", "RGBTEST", "TWINKLE",
+};
+
+#endif
+
+/*********************************
+ * OLED (左右とも縦向き)          *
+ *********************************
+ * OLED は縦長に取り付けられているので、左右とも 90 度回転して縦向き (横5文字 x 縦16行) で表示する。
+ * 左手 (マスター): キーとレイヤ         右手 (スレーブ): トラックボール
+ *   Key                                  Ball
+ *   R3C4      押したキーの位置           x   移動量 x
+ *   Teams     押したキーの動作 (2行)     y   移動量 y
+ *    Mute     ホールド時は Ctrl など     CPI
+ *   L.2..     レイヤ 1〜4                700
+ *   TWINK     LED パターン + 番号 (2行)  AML ON/OFF
+ *   LE 0                                 550 タイムアウト(ms)
+ *   (8行目以降は空き。左右とも 8〜16行目)
+ * 右手は Ball・CPI・AML を自分では持っていないので、左手から送る (oled_sync)。
+ */
+#ifdef OLED_ENABLE
+
+#    include "lib/oledkit/oledkit.h"
+#    include "transactions.h"   // 左右の通信 (oled_sync)
+
+// 縦向きの OLED は 1行5文字 x 16行。行末で自動的に次の行へ進むので、
+// 改行(oled_advance_page)は使わず、文字数を数えて行を管理する
+#define OLED_LINE_CHARS 5
+#define OLED_LINES      16
+static uint8_t oled_col, oled_row;
+static uint8_t oled_wrap;   // 行末に来たとき次の行へ折り返してよい回数 (キー名の2行表示用)
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    // 左右とも縦向きで、USB の差し込み口側が上になる向き (左右で OLED の付き方が逆なので回転も逆)
+    return is_keyboard_left() ? OLED_ROTATION_270 : OLED_ROTATION_90;
+}
+
+static void put(char c) {
+    if (oled_col >= OLED_LINE_CHARS) {
+        if (!oled_wrap) return;                // はみ出し防止(次の行に回り込ませない)
+        oled_wrap--;
+        oled_set_cursor(0, ++oled_row);
+        oled_col = 0;
+    }
+    oled_write_char(c, false);
+    oled_col++;
+}
+
+static void put_P(const char *s) {
+    char c;
+    while ((c = pgm_read_byte(s++))) put(c);
+}
+
+static void put_hex(uint8_t v) {
+    v &= 0x0F;
+    put(v < 10 ? '0' + v : 'A' + v - 10);
+}
+
+// 数値(-255〜255)を右詰め w 桁で表示。負数は最上位桁の左に '-'
+// 表示する値はすべて3桁以内に収まる(CPI は100単位、AML は10ms単位で渡す)ので 8bit で計算して容量節約
+static void put_num(int16_t v, uint8_t w) {
+    uint8_t n = v < 0 ? -v : v;
+    char    h = '0', t = '0';
+    while (n >= 100) { n -= 100; h++; }
+    while (n >= 10)  { n -= 10;  t++; }
+    uint8_t len = (v < 0) + (h > '0' ? 3 : t > '0' ? 2 : 1);
+    while (w-- > len) put(' ');
+    if (v < 0) put('-');
+    if (h > '0') put(h);
+    if (h > '0' || t > '0') put(t);
+    put('0' + n);
+}
+
+static void end_line(void) {
+    while (oled_col < OLED_LINE_CHARS) put(' ');
+    oled_col = 0;
+    if (oled_row < OLED_LINES - 1) oled_set_cursor(0, ++oled_row);
+    else oled_row = OLED_LINES;
+}
+
+static void begin_screen(void) {
+    oled_set_cursor(0, 0);
+    oled_col = oled_row = oled_wrap = 0;
+}
+
+static void clear_rest(void) {
+    while (oled_row < OLED_LINES) end_line();
+}
+
+// "\0" 区切りで詰めた名前一覧から n 番目を表示 (固定長配列より容量が小さい)
+static void put_nth(const char *list, uint8_t n) {
+    while (n--) while (pgm_read_byte(list++));
+    put_P(list);
+}
+
+// 修飾キー名 (0:Ctrl 1:Shift 2:Alt 3:GUI)。Mac モード時は Alt→Opt, GUI→Cmd
+static void put_mod(uint8_t i) {
+    static const char names[] PROGMEM = "Ctrl\0Shift\0Alt\0Win\0Ctrl\0Shift\0Opt\0Cmd";
+    put_nth(names, (TOG_STATUS_WINMAC ? 4 : 0) + (i & 3));
+}
+
+// 5bit の修飾ビット(MT や S() など)を "Ctrl+Shift" のように表示 (左右は区別しない)
+static void put_mods(uint8_t mods) {
+    bool first = true;
+    for (uint8_t i = 0; i < 4; i++) {
+        if (mods & (1 << i)) {
+            if (!first) put('+');
+            put_mod(i);
+            first = false;
+        }
+    }
+}
+
+// 基本キーコード(0x00〜0xFF)の名前。JIS 配列の刻印で表示
+static void put_basic(uint8_t kc) {
+    static const char n28[] PROGMEM =   // 0x28〜0x39
+        "Enter\0Esc\0BkSp\0Tab\0Space\0-\0^\0@\0[\0]\0]\0;\0:\0Zen/Han\0,\0.\0/\0Caps";
+    static const char n46[] PROGMEM =   // 0x46〜0x52
+        "PrtSc\0ScrLk\0Pause\0Ins\0Home\0PgUp\0Del\0End\0PgDn\0Right\0Left\0Down\0Up";
+    static const char n87[] PROGMEM =   // 0x87〜0x8B
+        "\\\0Kana\0Yen\0Henkan\0Muhen";
+    if (kc == KC_NO) {
+        put_P(PSTR("(none)"));
+    } else if (kc >= KC_A && kc <= KC_Z) {
+        put('A' + kc - KC_A);
+    } else if (kc >= KC_1 && kc <= KC_0) {
+        put(kc == KC_0 ? '0' : '1' + kc - KC_1);
+    } else if (kc >= KC_ENTER && kc <= KC_CAPS_LOCK) {
+        put_nth(n28, kc - KC_ENTER);
+    } else if ((kc >= KC_F1 && kc <= KC_F12) || (kc >= KC_F13 && kc <= KC_F24)) {
+        uint8_t n = kc <= KC_F12 ? kc - KC_F1 + 1 : kc - KC_F13 + 13;
+        put('F');
+        put_num(n, n < 10 ? 1 : 2);
+    } else if (kc >= KC_PRINT_SCREEN && kc <= KC_UP) {
+        put_nth(n46, kc - KC_PRINT_SCREEN);
+    } else if (kc == KC_APPLICATION) {
+        put_P(PSTR("App"));
+    } else if (kc >= KC_INTERNATIONAL_1 && kc <= KC_INTERNATIONAL_5) {
+        put_nth(n87, kc - KC_INTERNATIONAL_1);
+    } else if (kc == KC_LANGUAGE_1) {
+        put_P(PSTR("Kana"));
+    } else if (kc == KC_LANGUAGE_2) {
+        put_P(PSTR("Eisu"));
+    } else if (kc == MS_BTN1) {
+        put_P(PSTR("Click L"));
+    } else if (kc == MS_BTN2) {
+        put_P(PSTR("Click R"));
+    } else if (kc == MS_BTN3) {
+        put_P(PSTR("Click M"));
+    } else if (kc >= KC_LEFT_CTRL && kc <= KC_RIGHT_GUI) {
+        put_mod(kc - KC_LEFT_CTRL);                 // 左右は区別せず表示 (容量節約)
+    } else {
+        put_P(PSTR("KC"));
+        put_hex(kc >> 4);
+        put_hex(kc);
+    }
+}
+
+// zoe のカスタムキー名。enum custom_keycodes と同じ順番で並べること
+// (WM_LGUI / WM_LCTL は Win/Mac で送るキーが変わるので put_tap() で別処理、ここは空)
+static const char user_names[] PROGMEM =
+    "To MAIN\0Win Mode\0Mac Mode\0IME Toggle\0\0\0Back\0Forward\0"
+    "(\0)\0{\0}\0[\0]\0_\0; :\0' \"\0+ *\0Precision\0Teams Mute\0-\0" "0 =";
+_Static_assert(JS_0EQL - MAIN == 21, "user_names の並びを enum custom_keycodes に合わせて更新すること");
+
+// Keyball のキー名 (KBC_RST=QK_KB_0 〜 AML_D50=QK_KB_12)
+static const char kb_names[] PROGMEM =
+    "Cfg Reset\0Cfg Save\0CPI+100\0CPI-100\0CPI+1000\0CPI-1000\0"
+    "Scroll Tog\0Scroll\0ScrDiv+\0ScrDiv-\0AML On/Off\0AML+50ms\0AML-50ms";
+
+// LED のキー名 (UG_TOGG 〜 UG_VALD)
+static const char ug_names[] PROGMEM =
+    "LED On/Off\0LED Next\0LED Prev\0Hue+\0Hue-\0Sat+\0Sat-\0Bright+\0Bright-";
+
+static const char layer_names[] PROGMEM = "MAIN\0MOUSE\0NUM\0FUNC\0ADJ1\0ADJ2";
+
+// 押したキーの動作を表示。タップ/ホールドのキーは、実際にホールドしたときはホールド側の動作を出す
+static void put_tap(uint16_t kc) {
+    if (last_key_held && IS_QK_MOD_TAP(kc)) {           // ホールド: 修飾キー名 ("Ctrl" など)
+        put_mods(QK_MOD_TAP_GET_MODS(kc));
+    } else if (last_key_held && IS_QK_LAYER_TAP(kc)) {  // ホールド: "NUM layer" など
+        put_nth(layer_names, QK_LAYER_TAP_GET_LAYER(kc));
+        put_P(PSTR(" layer"));
+    } else if (kc == AT_MS) {                                  // LALT_T(KC_F23) のタップは MOUSE へ移動
+        put_P(PSTR("To MOUSE"));
+    } else if (IS_QK_MOD_TAP(kc)) {
+        put_basic(QK_MOD_TAP_GET_TAP_KEYCODE(kc));
+    } else if (IS_QK_LAYER_TAP(kc)) {
+        put_basic(QK_LAYER_TAP_GET_TAP_KEYCODE(kc));
+    } else if (IS_QK_MODS(kc)) {                        // S(KC_2) など → "Shift+2"
+        put_mods(QK_MODS_GET_MODS(kc));
+        put('+');
+        put_basic(QK_MODS_GET_BASIC_KEYCODE(kc));
+    } else if (kc == WM_LGUI) {                         // Win: Winキー / Mac: Control
+        put_mod(TOG_STATUS_WINMAC ? 0 : 3);
+    } else if (kc == WM_LCTL) {                         // Win: Control / Mac: Command
+        put_mod(TOG_STATUS_WINMAC ? 3 : 0);
+    } else if (kc >= MAIN && kc <= JS_0EQL) {
+        put_nth(user_names, kc - MAIN);
+    } else if (kc >= QK_KB_0 && kc <= AML_D50) {
+        put_nth(kb_names, kc - QK_KB_0);
+    } else if (kc >= QK_UNDERGLOW_TOGGLE && kc <= QK_UNDERGLOW_VALUE_DOWN) {
+        put_nth(ug_names, kc - QK_UNDERGLOW_TOGGLE);
+#    ifdef RGBLIGHT_ENABLE
+    } else if (kc >= RGB_MODE_PLAIN && kc <= RGB_MODE_TWINKLE) {   // RGB_M_* → "LED:TWINKLE"
+        uint8_t i = pgm_read_byte(&rgb_key_to_idx[kc - RGB_MODE_PLAIN]);
+        put_P(PSTR("LED:"));
+        if (i != 0xFF) put_P(rgb_mode_name[i]);
+#    endif
+    } else if (kc < 0x100) {
+        put_basic(kc);
+    } else {                                            // 上記以外は 16進コード
+        put_P(PSTR("Code "));
+        for (int8_t sh = 12; sh >= 0; sh -= 4) put_hex(kc >> sh);
+    }
+}
+
+// 右手の OLED 表示用に、左手から送る情報 (右手は Ball・CPI・AML を自分では持っていない)
+typedef struct {
+    int8_t  x, y;   // ボールの移動量 (左手が PC へ送った値)
+    uint8_t cpi;    // CPI (100単位)
+    uint8_t aml;    // bit7: AML の ON/OFF, bit0-6: タイムアウト (10ms単位)
+} oled_sync_t;
+static oled_sync_t oled_sync;
+
+// 右手側: 左手から届いた情報を保存するだけ (分割通信の割り込み内で呼ばれるので重い処理はしない)
+static void oled_sync_handler(uint8_t in_len, const void *in_data, uint8_t out_len, void *out_data) {
+    memcpy(&oled_sync, in_data, sizeof(oled_sync));
+}
+
+void keyboard_post_init_user(void) {
+    transaction_register_rpc(USER_OLED_SYNC, oled_sync_handler);
+}
+
+// 左手側: 値が変わったら (最短 100ms 間隔で)、変わらなくても 1秒ごとに右手へ送る
+void housekeeping_task_user(void) {
+    if (!is_keyboard_master()) return;
+    static uint32_t    last_sent;
+    static oled_sync_t sent;
+    oled_sync_t now = {
+        .x   = keyball.last_mouse.x,
+        .y   = keyball.last_mouse.y,
+        .cpi = keyball_get_cpi(),
+#    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+        .aml = (get_auto_mouse_enable() ? 0x80 : 0) | (get_auto_mouse_timeout() / 10),
+#    endif
+    };
+    uint32_t elapsed = timer_elapsed32(last_sent);
+    if ((memcmp(&now, &sent, sizeof(now)) && elapsed >= 100) || elapsed >= 1000) {
+        if (transaction_rpc_send(USER_OLED_SYNC, sizeof(now), &now)) sent = now;
+        last_sent = timer_read32();
+    }
+}
+
+// 左手 (マスター): キーとレイヤ
+void oledkit_render_info_user(void) {
+    uint16_t kc = keyball.last_kc;
+    begin_screen();
+
+    put_P(PSTR("Key"));
+    end_line();
+
+    // 押したキーの位置
+    put('\xB8');
+    put_hex(keyball.last_pos.row);
+    put('\xB9');
+    put_hex(keyball.last_pos.col);
+    end_line();
+
+    // 押したキーの動作 (2行まで。短いときも2行分使って下の行の位置を固定)
+    uint8_t start = oled_row;
+    oled_wrap = 1;
+    put_tap(kc);
+    oled_wrap = 0;
+    end_line();
+    if (oled_row < start + 2) end_line();
+
+    // レイヤ 1〜4 (MOUSE〜ADJUST1)
+    put('L');
+    for (uint8_t i = _MOUSE; i <= _ADJUST1; i++) put(layer_state_is(i) ? '0' + i : '\xB0');
+    end_line();
+
+#    ifdef RGBLIGHT_ENABLE
+    // LED 発光パターン: パターン名 + パターン内の番号(0始まり)。2行まで使う (短いときも2行分使って下の行の位置を固定)。消灯中は "OFF"
+    start = oled_row;
+    if (!rgblight_is_enabled()) {
+        put_P(PSTR("OFF"));
+    } else {
+        uint8_t m = rgblight_get_mode();
+        uint8_t i = sizeof(rgb_mode_base) - 1;
+        while (i > 0 && m < pgm_read_byte(&rgb_mode_base[i])) i--;
+        oled_wrap = 1;
+        put_P(rgb_mode_name[i]);
+        put(' ');
+        put('0' + m - pgm_read_byte(&rgb_mode_base[i]));
+        oled_wrap = 0;
+    }
+    end_line();
+    if (oled_row < start + 2) end_line();
+#    endif
+
+    clear_rest();
+}
+
+// 右手 (スレーブ): トラックボール (oledkit が右手側で呼ぶ関数)
+void oledkit_render_logo_user(void) {
+    begin_screen();
+
+    put_P(PSTR("Ball"));
+    end_line();
+    put_num(oled_sync.x, 5);
+    end_line();
+    put_num(oled_sync.y, 5);
+    end_line();
+
+    put_P(PSTR("\xBC\xBD"));   // CPI
+    end_line();
+    put_num(oled_sync.cpi, 3);
+    put_P(PSTR("00"));
+    end_line();
+
+#    ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+    put_P(PSTR("\xC2\xC3"));   // AML
+    put_P((oled_sync.aml & 0x80) ? PSTR("\xB2\xB3") : PSTR("\xB4\xB5"));   // ON / OFF
+    end_line();
+    put_num(oled_sync.aml & 0x7F, 3);
+    put('0');
+    end_line();
+#    endif
+    clear_rest();
+}
+#endif

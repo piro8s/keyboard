@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
 // #  define RGBLIGHT_EFFECT_SNAKE   // 容量節約のため無効 (Flow Tap 用)
 // #  define RGBLIGHT_EFFECT_KNIGHT   // 容量節約のため無効 (Flow Tap 用)
-#    define RGBLIGHT_EFFECT_CHRISTMAS
+// #  define RGBLIGHT_EFFECT_CHRISTMAS   // 容量節約のため無効 (OLED の太陽と月のため)
 #    define RGBLIGHT_EFFECT_STATIC_GRADIENT
 #    define RGBLIGHT_EFFECT_RGB_TEST
 // #  define RGBLIGHT_EFFECT_ALTERNATING   // 容量節約のため無効 (Flow Tap 用)
@@ -56,4 +56,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //   ライブラリの既定値 2 は「縦のみ/横のみ/自由」の切替式で、初期状態の縦のみだと横スクロールが一切効かない
 #define KEYBALL_SCROLLSNAP_ENABLE 1
 // 右手の OLED に Ball・CPI・AML を表示するため、左手から右手へ送る通信 (keymap.c の oled_sync)
-#define SPLIT_TRANSACTION_IDS_USER USER_OLED_SYNC
+// ボールを動かすと値が壊れるので無効にした (keymap.c の OLED の説明を参照)
+// #define SPLIT_TRANSACTION_IDS_USER USER_OLED_SYNC
